@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/product_model.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/providers/inventory_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/inventory_storage_repository_impl.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/inventory_reusable_widgets.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/widgets/inventory_reusable_widgets.dart';
 import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
 
 class EditProductPage extends ConsumerStatefulWidget {
@@ -60,7 +60,7 @@ class _EditProductPageState extends ConsumerState<EditProductPage> {
       _selectedCategoryId = categoryAndBrand['category_id'] ?? '';
       _categoryCtrl.text = categoryAndBrand['category_name'] ?? '';
       _brandCtrl.text = categoryAndBrand['brand_id'] ?? '';
-      _brandCategoryIdCtrl.text = widget.product.brandCategoryId ?? '';
+      _brandCategoryIdCtrl.text = widget.product.brandCategoryId;
     });
 
     // Cargar marcas relacionadas con la categoría

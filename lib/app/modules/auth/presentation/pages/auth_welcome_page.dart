@@ -5,8 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/infrastructure/providers/authProvider.dart';
 import 'package:mangueras_sv_entire/core/routes/router.dart';
 
-class WelcomePage extends ConsumerStatefulWidget {
-  const WelcomePage({Key? key, this.title}) : super(key: key);
+class AuthWelcomePage extends ConsumerStatefulWidget {
+  const AuthWelcomePage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 
@@ -14,7 +14,7 @@ class WelcomePage extends ConsumerStatefulWidget {
   _WelcomePageState createState() => _WelcomePageState();
 }
 
-class _WelcomePageState extends ConsumerState<WelcomePage> {
+class _WelcomePageState extends ConsumerState<AuthWelcomePage> {
   Widget _primaryButton({
     required String text,
     required VoidCallback onTap,

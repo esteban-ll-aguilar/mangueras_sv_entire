@@ -6,13 +6,14 @@ import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/create_u
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/loginPage.dart';
 // import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/signUpPage.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/forgotPasswordPage.dart';
-import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/welcomePage.dart';
+import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/auth_welcome_page.dart';
 import 'package:mangueras_sv_entire/app/modules/home/presentation/pages/homePage.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_brands_form_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_categories_form_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_product_form_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_brands_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_categories_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/created_pages/create_brands_form_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/created_pages/create_categories_form_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/created_pages/create_product_form_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/view_pages/view_brands_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/view_pages/view_categories_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/shop/pages/shop_welcome_page.dart';
 
 enum AppRouterNames {
   login,
@@ -81,18 +82,13 @@ class RouterNotifier extends ChangeNotifier {
     GoRoute(
       path: '/',
       name: AppRouterNames.welcome.name,
-      builder: (context, state) => const WelcomePage(),
+      builder: (context, state) => const ShopWelcomePage(),
     ),
     GoRoute(
       path: '/login',
       name: AppRouterNames.login.name,
       builder: (context, state) => const LoginPage(),
     ),
-    // GoRoute(
-    //   path: '/signup',
-    //   name: AppRouterNames.signup.name,
-    //   builder: (context, state) => const SignupPage(),
-    // ),
     GoRoute(
       path: '/forgot-password',
       name: AppRouterNames.forgotPassword.name,
@@ -118,11 +114,6 @@ class RouterNotifier extends ChangeNotifier {
       name: AppRouterNames.createProducts.name,
       builder: (context, state) => const CreateProductsFormPage(),
     ),
-    // GoRoute(
-    //   path: '/products',
-    //   name: AppRouterNames.products.name,
-    //   // builder: (context, state) => const ProductsPage(),
-    // ),
     GoRoute(
       path: '/categories',
       name: AppRouterNames.categories.name,
