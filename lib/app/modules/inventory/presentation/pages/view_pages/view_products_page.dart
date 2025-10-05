@@ -147,7 +147,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
         centerTitle: true,
         elevation: 0,
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(160),
+          preferredSize: Size.fromHeight(width < 600 ? 200 : 160), // Altura adaptativa
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             child: Column(
@@ -157,18 +157,14 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
                 _buildSearchField(),
                 const SizedBox(height: 8),
                 
-                // Filtros por categoría y marca
-                Row(
-                  children: [
-                    Expanded(child: _buildCategoryFilter()),
-                    const SizedBox(width: 8),
-                    Expanded(child: _buildBrandFilter()),
-                  ],
-                ),
+                // Filtros por categoría y marca (adaptativo)
+                width < 600 
+                    ? _buildVerticalFilters() 
+                    : _buildHorizontalFilters(),
                 const SizedBox(height: 8),
                 
                 // Botones de filtros y ordenamiento
-                _buildFilterButtons(),
+                _buildFilterButtons(width),
               ],
             ),
           ),
@@ -226,6 +222,203 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
         },
         child: const Icon(Icons.add),
         tooltip: 'Crear producto',
+      ),
+    );
+  }
+
+  // Nuevo: Filtros verticales para pantallas pequeñas
+  Widget _buildVerticalFilters() {
+    return Column(
+      children: [
+        _buildCategoryFilter(),
+        const SizedBox(height: 8),
+        _buildBrandFilter(),
+      ],
+    );
+  }
+
+  // Nuevo: Filtros horizontales para pantallas grandes
+  Widget _buildHorizontalFilters() {
+    return Row(
+      children: [
+        Expanded(child: _buildCategoryFilter()),
+        const SizedBox(width: 8),
+        Expanded(child: _buildBrandFilter()),
+      ],
+    );
+  }
+
+  Widget _buildFilterButtons(double screenWidth) {
+    if (screenWidth < 500) {
+      // Layout vertical para pantallas muy pequeñas
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(child: _buildSortButton()),
+              const SizedBox(width: 8),
+              Expanded(child: _buildAdvancedFiltersButton()),
+            ],
+          ),
+          if (_activeFiltersCount > 0) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _clearAllFilters,
+                icon: const Icon(Icons.clear, size: 16),
+                label: const Text('Limpiar filtros', style: TextStyle(fontSize: 12)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                ),
+              ),
+            ),
+          ],
+        ],
+      );
+    } else if (screenWidth < 600) {
+      // Layout compacto para pantallas pequeñas
+      return Row(
+        children: [
+          Expanded(flex: 2, child: _buildSortButtonCompact()),
+          const SizedBox(width: 4),
+          Expanded(flex: 2, child: _buildAdvancedFiltersButtonCompact()),
+          if (_activeFiltersCount > 0) ...[
+            const SizedBox(width: 4),
+            _buildClearButton(),
+          ],
+        ],
+      );
+    } else {
+      // Layout normal para pantallas grandes
+      return Row(
+        children: [
+          Flexible(child: _buildSortButton()),
+          const SizedBox(width: 8),
+          _buildAdvancedFiltersButton(),
+          const SizedBox(width: 8),
+          if (_activeFiltersCount > 0) _buildClearButton(),
+        ],
+      );
+    }
+  }
+
+  Widget _buildSortButton() {
+    return OutlinedButton.icon(
+      onPressed: _showSortDialog,
+      icon: const Icon(Icons.sort, size: 16),
+      label: Text(
+        _getSortText(), 
+        style: const TextStyle(fontSize: 12),
+        overflow: TextOverflow.ellipsis,
+      ),
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      ),
+    );
+  }
+
+  Widget _buildAdvancedFiltersButton() {
+    return OutlinedButton.icon(
+      onPressed: _showAdvancedFiltersDialog,
+      icon: Icon(
+        Icons.filter_alt,
+        size: 16,
+        color: _activeFiltersCount > 0 ? Theme.of(context).primaryColor : null,
+      ),
+      label: Text(
+        _activeFiltersCount > 0 ? 'Filtros ($_activeFiltersCount)' : 'Filtros',
+        style: const TextStyle(fontSize: 12),
+        overflow: TextOverflow.ellipsis,
+      ),
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        side: _activeFiltersCount > 0 
+            ? BorderSide(color: Theme.of(context).primaryColor)
+            : null,
+      ),
+    );
+  }
+
+  // Nuevos métodos para botones compactos
+  Widget _buildSortButtonCompact() {
+    return OutlinedButton(
+      onPressed: _showSortDialog,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.sort, size: 14),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              _getSortTextShort(),
+              style: const TextStyle(fontSize: 11),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdvancedFiltersButtonCompact() {
+    return OutlinedButton(
+      onPressed: _showAdvancedFiltersDialog,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        side: _activeFiltersCount > 0 
+            ? BorderSide(color: Theme.of(context).primaryColor)
+            : null,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.filter_alt,
+            size: 14,
+            color: _activeFiltersCount > 0 ? Theme.of(context).primaryColor : null,
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              _activeFiltersCount > 0 ? 'F($_activeFiltersCount)' : 'Filtros',
+              style: const TextStyle(fontSize: 11),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Método para texto corto del sort
+  String _getSortTextShort() {
+    String text = '';
+    switch (_sortBy) {
+      case 'name': text = 'Nom'; break;
+      case 'price': text = 'Pre'; break;
+      case 'stock': text = 'Stk'; break;
+      case 'code': text = 'Cod'; break;
+    }
+    return '$text ${_sortAscending ? '↑' : '↓'}';
+  }
+
+  Widget _buildClearButton() {
+    return SizedBox(
+      width: 32,
+      height: 32,
+      child: OutlinedButton(
+        onPressed: _clearAllFilters,
+        style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: const Icon(Icons.clear, size: 16),
       ),
     );
   }
@@ -361,186 +554,6 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
           },
         );
       },
-    );
-  }
-
-  Widget _buildFilterButtons() {
-    return Row(
-      children: [
-        // Botón de ordenamiento
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: _showSortDialog,
-            icon: const Icon(Icons.sort, size: 16),
-            label: Text(_getSortText(), style: const TextStyle(fontSize: 12)),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        
-        // Botón de filtros avanzados
-        OutlinedButton.icon(
-          onPressed: _showAdvancedFiltersDialog,
-          icon: Icon(
-            Icons.filter_alt,
-            size: 16,
-            color: _activeFiltersCount > 0 ? Theme.of(context).primaryColor : null,
-          ),
-          label: Text(
-            _activeFiltersCount > 0 ? 'Filtros ($_activeFiltersCount)' : 'Filtros',
-            style: const TextStyle(fontSize: 12),
-          ),
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            side: _activeFiltersCount > 0 
-                ? BorderSide(color: Theme.of(context).primaryColor)
-                : null,
-          ),
-        ),
-        const SizedBox(width: 8),
-        
-        // Botón de limpiar filtros
-        if (_activeFiltersCount > 0)
-          OutlinedButton(
-            onPressed: _clearAllFilters,
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.all(6),
-              minimumSize: const Size(32, 32),
-            ),
-            child: const Icon(Icons.clear, size: 16),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildDropdownLoading(String label) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Row(
-          children: [
-            const SizedBox(width: 12),
-            const Icon(Icons.category, size: 20, color: Colors.grey),
-            const SizedBox(width: 8),
-            Text(label, style: const TextStyle(color: Colors.grey)),
-            const Spacer(),
-            const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            const SizedBox(width: 12),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDropdownEmpty(String message) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Text(message, style: const TextStyle(color: Colors.grey)),
-      ),
-    );
-  }
-
-  Widget _buildDropdownDisabled(String message) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.grey.shade100,
-      ),
-      child: Center(
-        child: Row(
-          children: [
-            const SizedBox(width: 12),
-            Icon(Icons.branding_watermark, size: 20, color: Colors.grey.shade400),
-            const SizedBox(width: 8),
-            Text(
-              message, 
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoadingState() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
-          Text('Cargando productos...'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState(String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 64,
-            color: Theme.of(context).colorScheme.error,
-          ),
-          const SizedBox(height: 16),
-          Text('Error al cargar productos'),
-          const SizedBox(height: 8),
-          Text(error, style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: _refresh,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Reintentar'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.inventory_2_outlined,
-            size: 64,
-            color: Colors.grey,
-          ),
-          const SizedBox(height: 16),
-          const Text('No se encontraron productos'),
-          if (_activeFiltersCount > 0) ...[
-            const SizedBox(height: 8),
-            const Text('Intenta ajustar los filtros'),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: _clearAllFilters,
-              icon: const Icon(Icons.clear),
-              label: const Text('Limpiar filtros'),
-            ),
-          ],
-        ],
-      ),
     );
   }
 
@@ -754,22 +767,6 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
     }
   }
 
-  // NUEVO: Métodos para verificar pertenencia a categoría/marca
-  bool _productBelongsToCategory(ProductModel product, String categoryId) {
-    // Aquí necesitamos verificar si el brandCategoryId del producto
-    // corresponde a una asociación que incluya esta categoría
-    // Por ahora retornamos true, pero necesitaremos implementar la lógica
-    return true; // TODO: Implementar lógica real
-  }
-
-  bool _productBelongsTobrand(ProductModel product, String brandId) {
-    // Aquí necesitamos verificar si el brandCategoryId del producto
-    // corresponde a una asociación que incluya esta marca
-    // Por ahora retornamos true, pero necesitaremos implementar la lógica
-    return true; // TODO: Implementar lógica real
-  }
-
-  // NUEVO: Métodos helper para obtener nombres
   String _getBrandName(Map<String, dynamic> productData) {
     final brandCategory = productData['brand_category'];
     if (brandCategory != null && brandCategory['brand'] != null) {
@@ -784,5 +781,148 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
       return brandCategory['category']['name'] ?? 'Sin categoría';
     }
     return 'Sin categoría';
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text('Cargando productos...'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          const SizedBox(height: 16),
+          Text('Error al cargar productos'),
+          const SizedBox(height: 8),
+          Text(error, style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: _refresh,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Reintentar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.inventory_2_outlined,
+            size: 64,
+            color: Colors.grey,
+          ),
+          const SizedBox(height: 16),
+          const Text('No se encontraron productos'),
+          if (_activeFiltersCount > 0) ...[
+            const SizedBox(height: 8),
+            const Text('Intenta ajustar los filtros'),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: _clearAllFilters,
+              icon: const Icon(Icons.clear),
+              label: const Text('Limpiar filtros'),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDropdownLoading(String label) {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            const Icon(Icons.category, size: 20, color: Colors.grey),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label, 
+                style: const TextStyle(color: Colors.grey),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownEmpty(String message) {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text(
+            message, 
+            style: const TextStyle(color: Colors.grey),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownDisabled(String message) {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.grey.shade100,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            Icon(Icons.branding_watermark, size: 20, color: Colors.grey.shade400),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message, 
+                style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

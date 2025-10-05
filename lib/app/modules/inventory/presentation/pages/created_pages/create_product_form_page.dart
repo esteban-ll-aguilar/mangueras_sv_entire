@@ -500,6 +500,10 @@ class _CreateProductsFormPageState
             labelText: 'Categoría del Producto',
             border: OutlineInputBorder(),
             prefixIcon: Icon(Icons.category),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 16,
+            ),
           ),
           hint: const Text('Seleccione una categoría'),
           items: categories.map((cat) {
@@ -525,6 +529,7 @@ class _CreateProductsFormPageState
             }
             return null;
           },
+          menuMaxHeight: MediaQuery.of(context).size.height * 0.3,
         );
       },
     );

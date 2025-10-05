@@ -20,17 +20,17 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isActive = product.isActive == true;
-    final isInStock = (product.stockQuantity ?? 0) > 0;
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    //  Adaptar altura según el ancho de pantalla
-    final isCompact = screenWidth < 600;
+    final isInStock = (product.stockQuantity) > 0;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        //  Calcular dimensiones basadas en las restricciones disponibles
         final cardWidth = constraints.maxWidth;
-        final isNarrow = cardWidth < 200;
+        final cardHeight = constraints.maxHeight;
+        
+        // Categorías de tamaño más específicas
+        final isVeryNarrow = cardWidth < 180;
+        final isNarrow = cardWidth < 220;
+        final isShort = cardHeight < 280;
 
         return Card(
           elevation: 2,
@@ -47,23 +47,25 @@ class ProductCard extends StatelessWidget {
             onTap: onTap,
             borderRadius: BorderRadius.circular(12),
             child: Column(
-              mainAxisSize: MainAxisSize.min, //  Usar tamaño mínimo
               children: [
-                //  Imagen con altura fija pero responsive
-                _buildImageSection(isActive, isInStock, isNarrow),
+                // Imagen con altura adaptativa
+                _buildImageSection(isActive, isInStock, isVeryNarrow, isShort),
 
-                //  Información del producto con flex adaptativo
+                // Información del producto
                 Expanded(
                   child: _buildInfoSection(
                     context,
                     isActive,
+                    isVeryNarrow,
                     isNarrow,
+                    isShort,
                     isInStock,
                   ),
                 ),
 
-                //  Botones de acción compactos
-                if (!isNarrow) _buildActionButtons(isActive),
+                // Botones de acción solo en pantallas más grandes
+                if (!isVeryNarrow && !isShort) 
+                  _buildActionButtons(isActive),
               ],
             ),
           ),
@@ -72,9 +74,19 @@ class ProductCard extends StatelessWidget {
     );
   }
 
-  Widget _buildImageSection(bool isActive, bool isInStock, bool isNarrow) {
+  Widget _buildImageSection(bool isActive, bool isInStock, bool isVeryNarrow, bool isShort) {
+    // Altura más agresivamente adaptativa
+    double imageHeight;
+    if (isVeryNarrow && isShort) {
+      imageHeight = 80;
+    } else if (isVeryNarrow || isShort) {
+      imageHeight = 90;
+    } else {
+      imageHeight = 110;
+    }
+
     return SizedBox(
-      height: isNarrow ? 100 : 120, //  Altura fija adaptativa
+      height: imageHeight,
       width: double.infinity,
       child: Stack(
         children: [
@@ -92,46 +104,49 @@ class ProductCard extends StatelessWidget {
                       height: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
-                          _buildPlaceholder(),
+                          _buildPlaceholder(isVeryNarrow),
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return _buildLoadingImage();
                       },
                     )
-                  : _buildPlaceholder(),
+                  : _buildPlaceholder(isVeryNarrow),
             ),
           ),
 
-          // Badges de estado en posición absoluta
+          // Badges de estado más compactos
           Positioned(
-            top: 6,
-            right: 6,
+            top: 4,
+            right: 4,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (!isActive) _buildStatusBadge('INACTIVO', Colors.red),
-                if (!isActive && !isInStock) const SizedBox(height: 3),
-                if (!isInStock) _buildStatusBadge('SIN STOCK', Colors.orange),
+                if (!isActive) _buildStatusBadge('INACT', Colors.red, isVeryNarrow),
+                if (!isActive && !isInStock) SizedBox(height: isVeryNarrow ? 1 : 2),
+                if (!isInStock) _buildStatusBadge('SIN STOCK', Colors.orange, isVeryNarrow),
               ],
             ),
           ),
 
-          // Código del producto
+          // Código del producto más compacto
           Positioned(
-            bottom: 6,
-            left: 6,
+            bottom: 4,
+            left: 4,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: EdgeInsets.symmetric(
+                horizontal: isVeryNarrow ? 3 : 5,
+                vertical: isVeryNarrow ? 1 : 2,
+              ),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(3),
               ),
               child: Text(
                 product.code,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: isNarrow ? 9 : 10,
+                  fontSize: isVeryNarrow ? 8 : 9,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -145,143 +160,192 @@ class ProductCard extends StatelessWidget {
   Widget _buildInfoSection(
     BuildContext context,
     bool isActive,
+    bool isVeryNarrow,
     bool isNarrow,
+    bool isShort,
     bool isInStock,
   ) {
     return Padding(
-      padding: EdgeInsets.all(isNarrow ? 8 : 12),
+      padding: EdgeInsets.all(isVeryNarrow ? 6 : (isNarrow ? 8 : 12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min, //  Tamaño mínimo
         children: [
           // Nombre del producto
-          Text(
-            product.name,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: isNarrow ? 12 : 14,
-              color: isActive ? null : Colors.grey,
-            ),
-            maxLines: isNarrow ? 1 : 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          //  Espaciado condicional
-          if (!isNarrow) const SizedBox(height: 4),
-
-          // Marca y categoría (solo si hay espacio)
-          if (!isNarrow && (brandName != null || categoryName != null))
-            Text(
-              '${brandName ?? ''} • ${categoryName ?? ''}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.blue[600],
-                fontWeight: FontWeight.w500,
-                fontSize: 11,
+          Flexible(
+            child: Text(
+              product.name,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: isVeryNarrow ? 11 : (isNarrow ? 12 : 14),
+                color: isActive ? null : Colors.grey,
+                height: 1.2,
               ),
-              maxLines: 1,
+              maxLines: isVeryNarrow ? 1 : (isShort ? 1 : 2),
               overflow: TextOverflow.ellipsis,
             ),
-          if (product.description != null &&
-              product.description!.isNotEmpty &&
-              !isNarrow)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
+          ),
+
+          // Espaciado condicional
+          if (!isVeryNarrow && !isShort) 
+            SizedBox(height: isNarrow ? 2 : 4),
+
+          // Marca y categoría solo en pantallas más grandes
+          if (!isVeryNarrow && !isShort && (brandName != null || categoryName != null))
+            Flexible(
               child: Text(
-                product.description!,
+                _buildBrandCategoryText(),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[700],
-                  fontSize: 11,
+                  color: Colors.blue[600],
+                  fontWeight: FontWeight.w500,
+                  fontSize: isNarrow ? 10 : 11,
+                  height: 1.2,
                 ),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
 
-          //  Spacer flexible para empujar el precio hacia abajo
+          // Descripción solo en pantallas grandes
+          if (!isVeryNarrow && !isNarrow && !isShort && 
+              product.description != null && product.description!.isNotEmpty)
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 3),
+                child: Text(
+                  product.description!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[700],
+                    fontSize: 10,
+                    height: 1.2,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+
+          // Spacer flexible
           const Spacer(),
 
-          //  Precio y stock en diseño compacto
-          _buildPriceAndStock(context, isActive, isInStock, isNarrow),
+          // Precio y stock
+          _buildPriceAndStock(context, isActive, isInStock, isVeryNarrow, isNarrow),
         ],
       ),
     );
+  }
+
+  String _buildBrandCategoryText() {
+    if (brandName != null && categoryName != null) {
+      return '$brandName • $categoryName';
+    } else if (brandName != null) {
+      return brandName!;
+    } else if (categoryName != null) {
+      return categoryName!;
+    }
+    return '';
   }
 
   Widget _buildPriceAndStock(
     BuildContext context,
     bool isActive,
     bool isInStock,
+    bool isVeryNarrow,
     bool isNarrow,
   ) {
-    if (isNarrow) {
-      //  Layout vertical compacto para pantallas pequeñas
+    if (isVeryNarrow) {
+      // Layout ultra compacto para pantallas muy pequeñas
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (product.price != null)
-            Text(
-              '\$${product.price!.toStringAsFixed(2)}',
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              '\$${product.price.toStringAsFixed(2)}',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                fontSize: 12,
+                fontSize: 11,
                 color: isActive ? Theme.of(context).primaryColor : Colors.grey,
               ),
             ),
+          ),
           const SizedBox(height: 2),
-          _buildStockBadge(isInStock, true),
+          _buildStockBadge(isInStock, true, isVeryNarrow),
+        ],
+      );
+    } else if (isNarrow) {
+      // Layout vertical compacto
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '\$${product.price.toStringAsFixed(2)}',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+              color: isActive ? Theme.of(context).primaryColor : Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 3),
+          _buildStockBadge(isInStock, true, false),
         ],
       );
     } else {
-      //  Layout horizontal para pantallas normales
+      // Layout horizontal para pantallas normales
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Precio
-          if (product.price != null)
-            Flexible(
+          Flexible(
+            flex: 2,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
               child: Text(
-                '\$${product.price!.toStringAsFixed(2)}',
+                '\$${product.price.toStringAsFixed(2)}',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: isActive
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey,
+                  color: isActive ? Theme.of(context).primaryColor : Colors.grey,
                 ),
-                overflow: TextOverflow.ellipsis,
               ),
             ),
-
-          // Stock
-          _buildStockBadge(isInStock, false),
+          ),
+          const SizedBox(width: 4),
+          Flexible(
+            flex: 1,
+            child: _buildStockBadge(isInStock, false, false),
+          ),
         ],
       );
     }
   }
 
-  Widget _buildStockBadge(bool isInStock, bool compact) {
+  Widget _buildStockBadge(bool isInStock, bool compact, bool veryCompact) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: compact ? 4 : 6,
-        vertical: compact ? 1 : 2,
+        horizontal: veryCompact ? 2 : (compact ? 3 : 5),
+        vertical: veryCompact ? 1 : (compact ? 1 : 2),
       ),
       decoration: BoxDecoration(
         color: isInStock
             ? Colors.green.withOpacity(0.1)
             : Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(3),
         border: Border.all(
           color: isInStock ? Colors.green : Colors.red,
-          width: 1,
+          width: 0.5,
         ),
       ),
-      child: Text(
-        'Stock: ${product.stockQuantity ?? 0}',
-        style: TextStyle(
-          fontSize: compact ? 9 : 10,
-          fontWeight: FontWeight.bold,
-          color: isInStock ? Colors.green[700] : Colors.red[700],
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          veryCompact ? '${product.stockQuantity}' : 'Stock: ${product.stockQuantity}',
+          style: TextStyle(
+            fontSize: veryCompact ? 8 : (compact ? 9 : 10),
+            fontWeight: FontWeight.bold,
+            color: isInStock ? Colors.green[700] : Colors.red[700],
+          ),
         ),
       ),
     );
@@ -289,61 +353,74 @@ class ProductCard extends StatelessWidget {
 
   Widget _buildActionButtons(bool isActive) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Colors.grey[300]!, width: 1),
+        ),
+      ),
       child: Row(
         children: [
           Expanded(
             child: TextButton.icon(
               onPressed: onTap,
-              icon: const Icon(Icons.edit, size: 14),
-              label: const Text('Editar', style: TextStyle(fontSize: 11)),
+              icon: const Icon(Icons.edit, size: 12),
+              label: const Text('Editar', style: TextStyle(fontSize: 14)),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 2),
-                minimumSize: const Size(0, 28),
+                minimumSize: const Size(0, 24),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
             ),
           ),
-          const SizedBox(width: 4),
-          TextButton.icon(
-            onPressed: onToggleActive,
-            icon: Icon(
-              isActive ? Icons.visibility_off : Icons.visibility,
-              size: 14,
-            ),
-            label: Text(
-              isActive ? 'Ocultar producto' : 'Activar producto',
-              style: const TextStyle(fontSize: 11),
-            ),
-            style: TextButton.styleFrom(
-              foregroundColor: isActive ? Colors.orange : Colors.green,
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              minimumSize: const Size(0, 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextButton.icon(
+              onPressed: onToggleActive,
+              icon: Icon(
+                isActive ? Icons.visibility_off : Icons.visibility,
+                size: 14,
+              ),
+              label: Text(
+                isActive ? 'Ocultar' : 'Activar',
+                style: const TextStyle(fontSize: 14),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: isActive ? Colors.orange : Colors.green,
+                padding: const EdgeInsets.symmetric(vertical: 1),
+                minimumSize: const Size(0, 24),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
             ),
           ),
+          const SizedBox(width: 12),
         ],
       ),
     );
   }
 
-  Widget _buildStatusBadge(String text, Color color) {
+  Widget _buildStatusBadge(String text, Color color, bool isVeryNarrow) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      padding: EdgeInsets.symmetric(
+        horizontal: isVeryNarrow ? 2 : 3,
+        vertical: 1,
+      ),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 8,
+          fontSize: isVeryNarrow ? 7 : 8,
           fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(bool isVeryNarrow) {
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -351,12 +428,18 @@ class ProductCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inventory_2_outlined, size: 32, color: Colors.grey[400]),
-          const SizedBox(height: 4),
-          Text(
-            'Sin imagen',
-            style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+          Icon(
+            Icons.inventory_2_outlined, 
+            size: isVeryNarrow ? 20 : 28, 
+            color: Colors.grey[400]
           ),
+          if (!isVeryNarrow) ...[
+            const SizedBox(height: 2),
+            Text(
+              'Sin imagen',
+              style: TextStyle(fontSize: 9, color: Colors.grey[500]),
+            ),
+          ],
         ],
       ),
     );
@@ -369,8 +452,8 @@ class ProductCard extends StatelessWidget {
       color: Colors.grey[200],
       child: const Center(
         child: SizedBox(
-          width: 24,
-          height: 24,
+          width: 20,
+          height: 20,
           child: CircularProgressIndicator(strokeWidth: 2),
         ),
       ),

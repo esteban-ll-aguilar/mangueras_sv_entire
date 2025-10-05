@@ -172,30 +172,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cerrar Sesión'),
-        content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Implementar lógica de cierre de sesión
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Cerrar Sesión'),
-          ),
-        ],
-      ),
-    );
-  }
-
   //Build show dialog change full name
   Future<void> _showChangeFullNameDialog() async {
     final SupabaseClient _supabase = ref.read(supabaseProvider);

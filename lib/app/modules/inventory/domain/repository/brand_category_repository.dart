@@ -24,4 +24,5 @@ abstract class BrandCategoryRepository
     String brandId,
   );
   Future<List<BrandCategoryModel>> getBrandCategoriesByCategoryId(String categoryId);
+  Future<List<Map<String, String>>> getBrandNameAndCategoryNameFromAssociationId(String associationId);
 }

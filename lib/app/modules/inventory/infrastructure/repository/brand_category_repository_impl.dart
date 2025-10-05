@@ -241,4 +241,38 @@ class BrandCategoryRepositoryImpl extends BrandCategoryRepository {
       throw Exception('Error al obtener asociaciones marca-categoría por categoría: $e');
     }
   }
+
+  @override
+  // Returns a list of maps with brand and category names
+  // Each map corresponds to one association identified by the associationId
+  // If no association is found, returns an empty list
+  //
+  // Example: {
+  //   'brand_id': 'BrandID',
+  //   'brand_name': 'BrandName',
+  //   'category_id': 'CategoryID',
+  //   'category_name': 'CategoryName'
+  // }
+  Future<List<Map<String, String>>> getBrandNameAndCategoryNameFromAssociationId(String associationId) async {
+    try {
+      final response = await _supabase
+          .from(supabaseTablesNames.brandCategoryTable.value)
+          .select('brand(id, name), category(id, name)')
+          .eq('id', associationId)
+          .single();
+
+      logging.i('Response for associationId $associationId: $response');
+
+      return [{
+        'brand_id': response['brand']['id'] as String,
+        'brand_name': response['brand']['name'] as String,
+        'category_id': response['category']['id'] as String,
+        'category_name': response['category']['name'] as String,
+      }];
+    } catch (e) {
+      throw Exception('Error al obtener asociaciones marca-categoría por categoría: $e');
+    }
+  }
+
+
 }
