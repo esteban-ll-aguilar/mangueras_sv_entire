@@ -4,21 +4,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/widgets/auth_reusable_widgets.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/brand_model.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/category_model.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/providers/inventory_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/inventory_storage_repository_impl.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/inventory_reusable_widgets.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/widgets/inventory_reusable_widgets.dart';
+import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
 import 'package:mangueras_sv_entire/core/routes/router.dart';
 
-class CreateBrandsFormPage extends ConsumerStatefulWidget {
-  const CreateBrandsFormPage({Key? key}) : super(key: key);
+class CreateCategoriesFormPage extends ConsumerStatefulWidget {
+  const CreateCategoriesFormPage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<CreateBrandsFormPage> createState() =>
-      _CreateBrandsFormPageState();
+  ConsumerState<CreateCategoriesFormPage> createState() =>
+      _CreateCategoriesFormPageState();
 }
 
-class _CreateBrandsFormPageState extends ConsumerState<CreateBrandsFormPage> {
+class _CreateCategoriesFormPageState extends ConsumerState<CreateCategoriesFormPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameCtrl = TextEditingController();
   final TextEditingController _descriptionCtrl = TextEditingController();
@@ -36,7 +37,7 @@ class _CreateBrandsFormPageState extends ConsumerState<CreateBrandsFormPage> {
     super.dispose();
   }
 
-  
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -44,11 +45,11 @@ class _CreateBrandsFormPageState extends ConsumerState<CreateBrandsFormPage> {
 
     try {
       final storageRepo = ref.read(inventoryStorageRepositoryProvider);
-      final brandRepo = ref.read(inventoryBrandCategoryRepositoryProvider);
+      final categoryRepo = ref.read(inventoryBrandCategoryRepositoryProvider);
 
-      // Crear la marca sin imagen (supongo que createBrand devuelve el BrandModel con id asignado)
-      final created = await brandRepo.createBrand(
-        BrandModel(
+      // Crear la categoría sin imagen (supongo que createCategory devuelve el CategoryModel con id asignado)
+      final created = await categoryRepo.createCategory(
+        CategoryModel(
           id: '',
           name: _nameCtrl.text.trim(),
           description: _descriptionCtrl.text.trim(),
@@ -56,7 +57,7 @@ class _CreateBrandsFormPageState extends ConsumerState<CreateBrandsFormPage> {
       );
 
       if (created == null) {
-        throw Exception('No se pudo crear la marca, revisa que no exista ya');
+        throw Exception('No se pudo crear la categoría, revisa que no exista ya');
       }
 
       String? uploadedFileName;
@@ -65,20 +66,21 @@ class _CreateBrandsFormPageState extends ConsumerState<CreateBrandsFormPage> {
       if (_imageBytes != null && _imageFileName != null) {
         // Subir imagen y obtener nombre de archivo en storage
         uploadedFileName = await storageRepo.uploadImage(
-          StorageFolder.brandImages,
+          StorageFolder.categoryImages,
           created.id,
           _imageBytes!,
           _imageFileName!,
         );
 
-        // Obtener URL pública y actualizar la marca
+        // Obtener URL pública y actualizar la categoría
         publicUrl = await storageRepo.getImageUrl(uploadedFileName);
-        await brandRepo.updateBrand(created.id, {'image_url': publicUrl});
+        logging.i('Imagen subida: ${created.id} - $publicUrl');
+        await categoryRepo.updateCategory(created.id, {'image_url': publicUrl});
       }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Marca creada correctamente')),
+          const SnackBar(content: Text('Categoría creada correctamente')),
         );
         // Eliminar field values
         _formKey.currentState!.reset();
@@ -108,7 +110,7 @@ class _CreateBrandsFormPageState extends ConsumerState<CreateBrandsFormPage> {
           context,
           routeName: AppRouterNames.home.name,
         ),
-        title: const Text('Añadir Marcas'),
+        title: const Text('Añadir Categorías'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -120,7 +122,7 @@ class _CreateBrandsFormPageState extends ConsumerState<CreateBrandsFormPage> {
                 controller: _nameCtrl,
                 decoration: const InputDecoration(
                   labelText: 'Nombre',
-                  hintText: 'Ingrese el nombre de la marca',
+                  hintText: 'Ingrese el nombre de la categoría',
                   border: OutlineInputBorder(),
                 ),
                 validator: (v) =>
@@ -131,7 +133,7 @@ class _CreateBrandsFormPageState extends ConsumerState<CreateBrandsFormPage> {
                 controller: _descriptionCtrl,
                 decoration: const InputDecoration(
                   labelText: 'Descripción',
-                  hintText: 'Ingrese la descripción de la marca',
+                  hintText: 'Ingrese la descripción de la categoría',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,

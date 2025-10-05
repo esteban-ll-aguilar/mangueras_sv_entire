@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/product_model.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/providers/inventory_providers.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/edit_pages/edit_product_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/product_card.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/inventory_reusable_widgets.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/edit_pages/edit_product_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/widgets/product_card.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/widgets/inventory_reusable_widgets.dart';
 
 class ProductsPage extends ConsumerStatefulWidget {
   const ProductsPage({super.key});

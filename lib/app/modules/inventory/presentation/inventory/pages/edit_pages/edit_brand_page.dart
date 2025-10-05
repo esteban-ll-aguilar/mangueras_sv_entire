@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/brand_model.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/providers/inventory_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/inventory_storage_repository_impl.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/inventory_reusable_widgets.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/widgets/inventory_reusable_widgets.dart';
 
 class EditBrandPage extends ConsumerStatefulWidget {
   final BrandModel brand;

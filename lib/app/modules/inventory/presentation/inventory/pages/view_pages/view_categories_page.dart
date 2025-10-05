@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/category_model.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/providers/inventory_providers.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/brand_category_cart.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/edit_pages/edit_category_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/widgets/brand_category_cart.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/edit_pages/edit_category_page.dart';
 
 class CategoriesPage extends ConsumerStatefulWidget {
   const CategoriesPage({super.key});
