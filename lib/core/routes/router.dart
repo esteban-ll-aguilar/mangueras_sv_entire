@@ -82,7 +82,7 @@ class RouterNotifier extends ChangeNotifier {
     GoRoute(
       path: '/',
       name: AppRouterNames.welcome.name,
-      builder: (context, state) => const ShopWelcomePage(),
+      builder: (context, state) => ShopWelcomePage(),
     ),
     GoRoute(
       path: '/login',

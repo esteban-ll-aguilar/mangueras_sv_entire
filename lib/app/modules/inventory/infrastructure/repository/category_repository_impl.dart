@@ -73,6 +73,24 @@ class CategoryRepositoryImpl extends CategoryRepository {
     }
   }
 
+
+  @override
+  Future<List<CategoryModel>> getMainCategories() async {
+    try {
+      final response = await _supabase
+          .from(supabaseTablesNames.categoryTable.value)
+          .select()
+          .eq('is_main_category', true)
+          .order('name', ascending: true);
+      return (response as List)
+          .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      logging.e('Error fetching main categories: $e');
+      return [];
+    }
+  }
+
   @override
   Future<List<Map<String, dynamic>>> getCategoriesDropdown() async {
     try {

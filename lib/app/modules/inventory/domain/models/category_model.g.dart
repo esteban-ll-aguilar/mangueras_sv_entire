@@ -11,6 +11,7 @@ CategoryModel _$CategoryModelFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
+      isMainCategory: json['is_main_category'] as bool? ?? false,
       imageUrl: json['image_url'] as String? ?? '',
     );
 
@@ -19,5 +20,6 @@ Map<String, dynamic> _$CategoryModelToJson(CategoryModel instance) =>
       'id': instance.id,
       'name': instance.name,
       'description': instance.description,
+      'is_main_category': instance.isMainCategory,
       'image_url': instance.imageUrl,
     };

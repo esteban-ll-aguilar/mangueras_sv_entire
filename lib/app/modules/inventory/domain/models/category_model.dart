@@ -6,12 +6,14 @@ class CategoryModel {
   final String id;
   final String name;
   final String? description;
+  final bool isMainCategory;
   final String? imageUrl;
 
   CategoryModel({
     required this.id,
     required this.name,
     this.description = '',
+    this.isMainCategory = false,
     this.imageUrl = '',
   });
 

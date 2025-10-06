@@ -60,6 +60,10 @@ class BrandCategoryRepositoryImpl extends BrandCategoryRepository {
       _categoryRepo.getCategoriesByName(name);
 
   @override
+  Future<List<CategoryModel>> getMainCategories() =>
+      _categoryRepo.getMainCategories();
+
+  @override
   Future<CategoryModel?> updateCategory(
     String categoryId,
     Map<String, dynamic> categoryData,
