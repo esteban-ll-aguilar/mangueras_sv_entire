@@ -3,8 +3,10 @@ import 'package:mangueras_sv_entire/app/modules/inventory/domain/repository/bran
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/repository/inventory_storage_repository.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/repository/product_repository.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/brand_category_repository_impl.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/drift_repository/inventory_drift_impl.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/inventory_storage_repository_impl.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/product_repository_impl.dart';
+import 'package:mangueras_sv_entire/app/shared/local_storage/infrastructure/providers/app_local_database.dart';
 import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
 
 
@@ -20,6 +22,12 @@ final inventoryProductRepositoryProvider = Provider<ProductRepository>((ref) {
   return ProductRepositoryImpl(supabase);
 });
 
+
+final inventoryDriftRepositoryProvider = FutureProvider<InventoryDriftRepositoryImpl>((ref) async {
+  final localDatabase = await ref.watch(localDatabaseProvider.future);
+  return InventoryDriftRepositoryImpl(localDatabase);
+});
+  
 
 final inventoryStorageRepositoryProvider = Provider<InventoryStorageRepository>((ref) {
   final supabase = ref.watch(supabaseProvider);

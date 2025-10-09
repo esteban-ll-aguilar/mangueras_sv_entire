@@ -47,6 +47,9 @@ dependencies:
   logger: ^2.6.1
   upgrader: ^12.1.0
   image_picker: ^1.2.0
+  url_launcher: ^6.3.2
+  font_awesome_flutter: ^10.10.0
+  drift: ^2.28.2
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +70,8 @@ dev_dependencies:
   json_serializable: ^6.11.1
   json_annotation: ^4.9.0
   #-------
+  drift_dev: ^2.28.3
+
 
 
 

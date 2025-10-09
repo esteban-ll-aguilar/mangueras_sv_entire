@@ -6,13 +6,14 @@ import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/create_u
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/loginPage.dart';
 // import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/signUpPage.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/forgotPasswordPage.dart';
-import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/auth_welcome_page.dart';
 import 'package:mangueras_sv_entire/app/modules/home/presentation/pages/homePage.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/created_pages/create_brands_form_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/created_pages/create_categories_form_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/created_pages/create_product_form_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/view_pages/view_brands_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/view_pages/view_categories_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/shop/pages/a.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/shop/pages/shop_products_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/shop/pages/shop_welcome_page.dart';
 
 enum AppRouterNames {
@@ -26,8 +27,10 @@ enum AppRouterNames {
   createProducts,
   products,
   categories,
+  shopCategories,
   brands,
   createUsers,
+  shopProducts,
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -70,7 +73,9 @@ class RouterNotifier extends ChangeNotifier {
         currentPath != '/' &&
         currentPath != '/login' &&
         // currentPath != '/signup' &&
-        currentPath != '/forgot-password') {
+        currentPath != '/forgot-password' &&
+        !currentPath.startsWith('/shop')
+        ) {
       return '/';
     }
 
@@ -128,6 +133,16 @@ class RouterNotifier extends ChangeNotifier {
       path: '/create-users',
       name: AppRouterNames.createUsers.name,
       builder: (context, state) => const CreateUserForm(),
+    ),
+    GoRoute(
+      path: '/shop/products',
+      name: AppRouterNames.shopProducts.name,
+      builder: (context, state) => ShopProductsPage(),
+    ),
+    GoRoute(
+      path: '/shop/help',
+      name: AppRouterNames.shopCategories.name,
+      builder: (context, state) => ProductsPage(),
     ),
   ];
 }
