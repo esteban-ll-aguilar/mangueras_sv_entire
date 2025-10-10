@@ -1,7 +1,7 @@
 // import 'package:drift/drift.dart';
 // import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/product_model.dart';
-// import 'package:mangueras_sv_entire/app/shared/local_storage/infrastructure/providers/app_local_database.dart';
 // import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
+// import 'package:mangueras_sv_entire/database/local_database/app_local_database.dart';
 
 // class ProductDriftRepositoryImpl {
 //   final AppLocalDatabase _localDatabase;

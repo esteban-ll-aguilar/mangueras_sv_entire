@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/shop/widgets/shop_products_page/shop_products_page_widgets.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/presentation/widgets/shop_products_page/shop_products_page_widgets.dart';
 
 
 

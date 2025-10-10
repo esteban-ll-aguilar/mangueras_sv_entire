@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/view_pages/view_brands_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/view_pages/view_categories_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/view_pages/view_products_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_brands_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_categories_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_products_page.dart';
 
 class InitHomePage extends StatefulWidget {
   const InitHomePage({super.key});

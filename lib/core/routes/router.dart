@@ -7,14 +7,14 @@ import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/loginPag
 // import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/signUpPage.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/forgotPasswordPage.dart';
 import 'package:mangueras_sv_entire/app/modules/home/presentation/pages/homePage.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/created_pages/create_brands_form_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/created_pages/create_categories_form_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/created_pages/create_product_form_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/view_pages/view_brands_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/inventory/pages/view_pages/view_categories_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/shop/pages/shop_products_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/shop/pages/shop_welcome_page.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/presentation/shop/pages/shop_cart_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_brands_form_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_categories_form_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_product_form_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_brands_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_categories_page.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/presentation/pages/shop_products_page.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/presentation/pages/shop_welcome_page.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/presentation/pages/shop_cart_page.dart';
 
 enum AppRouterNames {
   login,

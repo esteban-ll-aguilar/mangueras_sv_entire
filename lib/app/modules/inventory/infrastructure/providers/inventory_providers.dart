@@ -23,10 +23,10 @@ final inventoryProductRepositoryProvider = Provider<ProductRepository>((ref) {
 });
 
 
-final inventoryDriftRepositoryProvider = FutureProvider<InventoryDriftRepositoryImpl>((ref) async {
-  final localDatabase = await ref.watch(localDatabaseProvider.future);
-  return InventoryDriftRepositoryImpl(localDatabase);
-});
+// final inventoryDriftRepositoryProvider = FutureProvider<InventoryDriftRepositoryImpl>((ref) async {
+//   final localDatabase = await ref.watch(localDatabaseProvider.future);
+//   return InventoryDriftRepositoryImpl(localDatabase);
+// });
   
 
 final inventoryStorageRepositoryProvider = Provider<InventoryStorageRepository>((ref) {

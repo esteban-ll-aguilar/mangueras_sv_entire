@@ -1,0 +1,108 @@
+{
+    "_meta": {
+        "description": "This file contains a serialized version of schema entities for drift.",
+        "version": "1.2.0"
+    },
+    "options": {
+        "store_date_time_values_as_text": false
+    },
+    "entities": [
+        {
+            "id": 0,
+            "references": [],
+            "type": "table",
+            "data": {
+                "name": "cart_item_drift_model",
+                "was_declared_in_moor": false,
+                "columns": [
+                    {
+                        "name": "product_code",
+                        "getter_name": "productCode",
+                        "moor_type": "string",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "product_name",
+                        "getter_name": "productName",
+                        "moor_type": "string",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "product_image_url",
+                        "getter_name": "productImageUrl",
+                        "moor_type": "string",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "product_price",
+                        "getter_name": "productPrice",
+                        "moor_type": "double",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "quantity",
+                        "getter_name": "quantity",
+                        "moor_type": "int",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "brand_name",
+                        "getter_name": "brandName",
+                        "moor_type": "string",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "category_name",
+                        "getter_name": "categoryName",
+                        "moor_type": "string",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "added_at",
+                        "getter_name": "addedAt",
+                        "moor_type": "dateTime",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": "const CustomExpression('CAST(strftime(\\'%s\\', CURRENT_TIMESTAMP) AS INTEGER)')",
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    }
+                ],
+                "is_virtual": false,
+                "without_rowid": false,
+                "constraints": [],
+                "explicit_pk": [
+                    "product_code"
+                ]
+            }
+        }
+    ]
+}
