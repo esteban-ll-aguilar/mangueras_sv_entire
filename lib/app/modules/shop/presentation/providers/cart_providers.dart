@@ -1,46 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/product_model.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/domain/repository/cart_repository.dart';
-import 'package:mangueras_sv_entire/app/modules/shop/domain/repositories/drift_repository/cart_drift_repository_impl.dart';
-import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
-
-// ========== PROVIDER DEL REPOSITORIO ==========
-
-/// Provider del repositorio de carrito usando base de datos local
-final cartRepositoryProvider = FutureProvider<CartRepository>((ref) async {
-  final database = await ref.watch(localDatabaseProvider.future);
-  return CartDriftRepositoryImpl(database);
-});
-
-// ========== PROVIDERS DE DATOS ==========
-
-/// Provider que obtiene todos los items del carrito
-final cartItemsProvider = StreamProvider<List<CartItem>>((ref) async* {
-  final repository = await ref.watch(cartRepositoryProvider.future);
-  
-  // Emitir items iniciales
-  yield await repository.getAllCartItems();
-  
-  // Escuchar cambios (por ahora, recargar cada segundo para simular stream)
-  // En producción, Drift tiene watch() que emite streams automáticamente
-  await for (var _ in Stream.periodic(const Duration(milliseconds: 500))) {
-    yield await repository.getAllCartItems();
-  }
-});
-
-/// Provider que obtiene el contador de items en el carrito
-final cartItemsCountProvider = FutureProvider<int>((ref) async {
-  final repository = await ref.watch(cartRepositoryProvider.future);
-  return await repository.getCartItemsCount();
-});
-
-/// Provider que obtiene el total del carrito
-final cartTotalProvider = FutureProvider<double>((ref) async {
-  final repository = await ref.watch(cartRepositoryProvider.future);
-  return await repository.getCartTotal();
-});
-
-// ========== NOTIFIER PARA ACCIONES DEL CARRITO ==========
+import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
 
 /// Notifier para realizar acciones en el carrito
 class CartActionsNotifier extends AsyncNotifier<void> {

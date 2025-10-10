@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mangueras_sv_entire/app/modules/shop/presentation/pages/shop_cart_page.dart';
-import 'package:mangueras_sv_entire/app/modules/shop/presentation/providers/cart_providers.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/presentation/widgets/shop_products_page/shop_filters_sidebar.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/presentation/widgets/shop_products_page/shop_products_grid.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/presentation/widgets/shop_products_page/shop_products_page_appbar.dart';

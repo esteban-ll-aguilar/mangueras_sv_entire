@@ -1,40 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/brand_model.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/category_model.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/product_model.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/providers/inventory_providers.dart';
-
-// ========== PROVIDERS DE DATOS ==========
-
-/// Provider para obtener todos los productos
-final shopProductsProvider = FutureProvider<List<ProductModel>>((ref) async {
-  final productRepository = ref.watch(inventoryProductRepositoryProvider);
-  return await productRepository.getAllProducts();
-});
-
-/// Provider para obtener productos con detalles (incluye marca y categoría)
-final shopProductsWithDetailsProvider =
-    FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  final productRepository = ref.watch(inventoryProductRepositoryProvider);
-  return await productRepository.getAllProductsWithDetails();
-});
-
-/// Provider para obtener todas las marcas
-final shopBrandsProvider = FutureProvider<List<BrandModel>>((ref) async {
-  final brandCategoryRepository =
-      ref.watch(inventoryBrandCategoryRepositoryProvider);
-  return await brandCategoryRepository.getAllBrands();
-});
-
-/// Provider para obtener todas las categorías
-final shopCategoriesProvider =
-    FutureProvider<List<CategoryModel>>((ref) async {
-  final brandCategoryRepository =
-      ref.watch(inventoryBrandCategoryRepositoryProvider);
-  return await brandCategoryRepository.getAllCategories();
-});
-
-// ========== ESTADO DE FILTROS ==========
+import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
 
 /// Estado de los filtros seleccionados
 class ShopFiltersState {

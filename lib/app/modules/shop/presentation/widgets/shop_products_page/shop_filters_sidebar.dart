@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/presentation/providers/shop_providers.dart';
 
 /// Widget del sidebar con filtros de marcas y categorías

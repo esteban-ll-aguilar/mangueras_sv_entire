@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/presentation/providers/cart_providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,9 +39,11 @@ class ShopCartPage extends ConsumerWidget {
           cartItemsAsync.when(
             data: (items) => items.isNotEmpty
                 ? IconButton(
+                    color: const Color.fromARGB(255, 212, 45, 45),
                     icon: const Icon(Icons.delete_sweep),
                     tooltip: 'Limpiar carrito',
                     onPressed: () => _showClearCartDialog(context, ref),
+                    hoverColor: Colors.red.withOpacity(0.1),
                   )
                 : const SizedBox.shrink(),
             loading: () => const SizedBox.shrink(),
@@ -236,7 +239,7 @@ class _EmptyCartView extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           ElevatedButton.icon(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.go('/shop/products'),
             icon: const Icon(Icons.arrow_back_ios),
             label: const Text('Ir a Productos'),
             style: ElevatedButton.styleFrom(

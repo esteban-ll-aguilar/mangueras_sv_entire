@@ -1,5 +1,6 @@
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/product_model.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/domain/repository/cart_repository.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/domain/models/cart_item_model.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/domain/repository/cart_repository.dart';
 import 'package:mangueras_sv_entire/database/local_database/app_local_database.dart';
 import 'package:drift/drift.dart';
 
@@ -10,11 +11,11 @@ class CartDriftRepositoryImpl implements CartRepository {
   CartDriftRepositoryImpl(this._database);
 
   @override
-  Future<List<CartItem>> getAllCartItems() async {
+  Future<List<CartItemModel>> getAllCartItems() async {
     final items = await _database.select(_database.cartItemDriftModel).get();
     
     return items.map((item) {
-      return CartItem(
+      return CartItemModel(
         productCode: item.productCode,
         productName: item.productName,
         productImageUrl: item.productImageUrl,

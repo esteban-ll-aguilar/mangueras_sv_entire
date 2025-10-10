@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/product_model.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/presentation/widgets/shop_products_page/expandable_text.dart';
 
 /// Widget que muestra una tarjeta de producto con su información
 class ShopProductCard extends StatefulWidget {
@@ -55,12 +56,14 @@ class _ShopProductCardState extends State<ShopProductCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildUnitBadge(),
-                    const SizedBox(height: 8),
                     _buildProductName(),
                     const SizedBox(height: 4),
                     _buildProductCode(),
-                    const Spacer(),
+                    const SizedBox(height: 4),
+                    _buildProductDescription(),
+                    const SizedBox(height: 4),
+                    const Divider(),
+                    const SizedBox(height: 4),
                     _buildStockInfo(),
                     const SizedBox(height: 4),
                     _buildPrice(),
@@ -88,12 +91,11 @@ class _ShopProductCardState extends State<ShopProductCard> {
               top: Radius.circular(12),
             ),
           ),
-          child: Center(
-            child: widget.product.imageUrl != null && widget.product.imageUrl!.isNotEmpty
+          clipBehavior: Clip.antiAlias,
+          child: widget.product.imageUrl != null && widget.product.imageUrl!.isNotEmpty
                 ? Image.network(
                     widget.product.imageUrl!,
-                    height: 140,
-                    fit: BoxFit.contain,
+                    fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return const CircularProgressIndicator();
@@ -103,58 +105,36 @@ class _ShopProductCardState extends State<ShopProductCard> {
                   )
                 : const Icon(Icons.inventory_2, size: 80, color: Colors.grey),
           ),
-        ),
         // Botón favorito
-        Positioned(
-          top: 8,
-          right: 8,
-          child: IconButton(
-            icon: Icon(
-              widget.isFavorite ? Icons.favorite : Icons.favorite_border,
-              size: 20,
-              color: widget.isFavorite ? Colors.red : null,
-            ),
-            onPressed: widget.onToggleFavorite,
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.white,
-              padding: const EdgeInsets.all(8),
-            ),
-          ),
-        ),
+        // Positioned(
+        //   top: 8,
+        //   right: 8,
+        //   child: IconButton(
+        //     icon: Icon(
+        //       widget.isFavorite ? Icons.favorite : Icons.favorite_border,
+        //       size: 20,
+        //       color: widget.isFavorite ? Colors.red : null,
+        //     ),
+        //     onPressed: widget.onToggleFavorite,
+        //     style: IconButton.styleFrom(
+        //       backgroundColor: Colors.white,
+        //       padding: const EdgeInsets.all(8),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
 
-  /// Badge de unidad
-  Widget _buildUnitBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 6,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.blue[100],
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: const Text(
-        '1 UND',
-        style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
+  
   /// Nombre del producto
   Widget _buildProductName() {
     return Text(
       widget.product.name,
       style: const TextStyle(
-        fontWeight: FontWeight.w500,
-        fontSize: 13,
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
       ),
-      maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -165,8 +145,14 @@ class _ShopProductCardState extends State<ShopProductCard> {
       'Ref: ${widget.product.code}',
       style: TextStyle(
         color: Colors.grey[600],
-        fontSize: 12,
+        fontSize: 16,
       ),
+    );
+  }
+  Widget _buildProductDescription() {
+    return ExpandableText(
+      widget.product.description ?? 'Sin descripción',
+      maxLines: 1,
     );
   }
 
