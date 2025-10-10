@@ -6,7 +6,7 @@ import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/reposit
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/drift_repository/inventory_drift_impl.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/inventory_storage_repository_impl.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/product_repository_impl.dart';
-import 'package:mangueras_sv_entire/app/shared/local_storage/infrastructure/providers/app_local_database.dart';
+import 'package:mangueras_sv_entire/database/local_database/app_local_database.dart';
 import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
 
 
