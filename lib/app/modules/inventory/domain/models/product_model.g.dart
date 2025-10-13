@@ -15,6 +15,10 @@ ProductModel _$ProductModelFromJson(Map<String, dynamic> json) => ProductModel(
   price: (json['price'] as num).toDouble(),
   stockQuantity: (json['stock_quantity'] as num).toInt(),
   isActive: json['is_active'] as bool,
+  brandId: json['brand_id'] as String?,
+  brandName: json['brand_name'] as String?,
+  categoryId: json['category_id'] as String?,
+  categoryName: json['category_name'] as String?,
 );
 
 Map<String, dynamic> _$ProductModelToJson(ProductModel instance) =>

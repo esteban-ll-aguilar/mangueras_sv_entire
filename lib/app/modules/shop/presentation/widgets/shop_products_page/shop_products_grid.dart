@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mangueras_sv_entire/app/modules/shop/presentation/providers/cart_providers.dart';
-import 'package:mangueras_sv_entire/app/modules/shop/presentation/providers/shop_providers.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/cart_providers.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/presentation/widgets/shop_products_page/shop_product_card.dart';
 
 /// Widget del grid de productos con filtros aplicados
@@ -39,15 +40,15 @@ class ShopProductsGrid extends ConsumerWidget {
                 return _EmptyState();
               }
 
-              final crossAxisCount = isDesktop ? 3 : (isTablet ? 2 : 1);
 
               return GridView.builder(
                 padding: const EdgeInsets.all(16),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  childAspectRatio: 0.7,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                  crossAxisCount: isDesktop
+                      ? 4
+                      : isTablet
+                          ? 3
+                          : 1,
                 ),
                 itemCount: products.length,
                 itemBuilder: (context, index) {
@@ -59,8 +60,10 @@ class ShopProductsGrid extends ConsumerWidget {
                       await ref.read(cartActionsProvider.notifier).addToCart(
                             product: product,
                             quantity: quantity,
+                            brandName: product.brandName,
+                            categoryName: product.categoryName
                           );
-                      
+                        
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -69,15 +72,12 @@ class ShopProductsGrid extends ConsumerWidget {
                             action: SnackBarAction(
                               label: 'Ver carrito',
                               onPressed: () {
-                                // TODO: Navegar a página del carrito
+                                context.go('/shop/cart');
                               },
                             ),
                           ),
                         );
                       }
-                    },
-                    onToggleFavorite: () {
-                      // TODO: Toggle favorito
                     },
                   );
                 },
@@ -141,14 +141,6 @@ class _ProductsToolbar extends StatelessWidget {
           if (!isMobile)
             Row(
               children: [
-                TextButton.icon(
-                  onPressed: () {
-                    // TODO: Implementar ordenamiento
-                  },
-                  icon: const Icon(Icons.sort, size: 20),
-                  label: const Text('Ordenar'),
-                ),
-                const SizedBox(width: 8),
                 if (hasActiveFilters)
                   TextButton(
                     onPressed: onClearFilters,

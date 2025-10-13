@@ -1,11 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/presentation/widgets/shop_products_page/shop_products_page_widgets.dart';
-
-
-
-
 
 
 class ShopProductsPageAppbar extends StatelessWidget implements PreferredSizeWidget {
@@ -54,32 +51,7 @@ class ShopProductsPageAppbar extends StatelessWidget implements PreferredSizeWid
                       width: 1,
                     ),
                   ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Buscar productos...',
-                      hintStyle: TextStyle(
-                        color: Colors.grey[500],
-                        fontSize: 14,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Colors.grey[600],
-                        size: 22,
-                      ),
-                      border: UnderlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      // Implementa tu lógica de búsqueda
-                      print('Buscando: $value');
-                    },
-                  ),
+                  child: _SearchProductsField(),
                 ),
               ),
               const SizedBox(width: 16),
@@ -105,77 +77,25 @@ class ShopProductsPageAppbar extends StatelessWidget implements PreferredSizeWid
 }
 
 
-
-
-
-Widget _sidebarButton({
-  required IconData icon,
-  String? label,
-  int? badge,
-  required VoidCallback onTap,
-  Color? color,
-  double iconSize = 24,
-}) {
-  return InkWell(
-    onTap: onTap,
-    borderRadius: BorderRadius.circular(10),
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+class _SearchProductsField extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return TextField(
+      decoration: InputDecoration(
+        hintText: 'Buscar Marcas o Categorías...',
+        prefixIcon: const Icon(Icons.search, size: 20),
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center, // centrar verticalmente
-            children: [
-              Icon(icon, size: iconSize.toDouble(), color: color ?? Colors.black87),
-              const SizedBox(height: 2),
-              if (label != null)
-                Flexible(
-                  // permitir que el texto se reduzca / trunque en una sola línea
-                  child: Text(
-                    label!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: color ?? Colors.black87,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          if (badge != null && badge > 0)
-            Positioned(
-              right: -4,
-              top: -4,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-                constraints: const BoxConstraints(
-                  minWidth: 18,
-                  minHeight: 18,
-                ),
-                child: Text(
-                  badge > 9 ? '9+' : badge.toString(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-        ],
-      ),
-    ),
-  );
+      onChanged: (value) {
+        ref.read(shopFiltersProvider.notifier).setSearchQuery(value);
+      },
+    );
+  }
 }

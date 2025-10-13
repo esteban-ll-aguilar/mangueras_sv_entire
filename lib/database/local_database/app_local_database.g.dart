@@ -98,6 +98,18 @@ class $CartItemDriftModelTable extends CartItemDriftModel
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _totalPriceMeta = const VerificationMeta(
+    'totalPrice',
+  );
+  @override
+  late final GeneratedColumn<double> totalPrice = GeneratedColumn<double>(
+    'total_price',
+    aliasedName,
+    false,
+    generatedAs: GeneratedAs(productPrice * quantity.cast<double>(), false),
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     productCode,
@@ -108,6 +120,7 @@ class $CartItemDriftModelTable extends CartItemDriftModel
     brandName,
     categoryName,
     addedAt,
+    totalPrice,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -192,6 +205,12 @@ class $CartItemDriftModelTable extends CartItemDriftModel
         addedAt.isAcceptableOrUnknown(data['added_at']!, _addedAtMeta),
       );
     }
+    if (data.containsKey('total_price')) {
+      context.handle(
+        _totalPriceMeta,
+        totalPrice.isAcceptableOrUnknown(data['total_price']!, _totalPriceMeta),
+      );
+    }
     return context;
   }
 
@@ -233,6 +252,10 @@ class $CartItemDriftModelTable extends CartItemDriftModel
         DriftSqlType.dateTime,
         data['${effectivePrefix}added_at'],
       )!,
+      totalPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}total_price'],
+      )!,
     );
   }
 
@@ -252,6 +275,7 @@ class cart_item_drift_model extends DataClass
   final String? brandName;
   final String? categoryName;
   final DateTime addedAt;
+  final double totalPrice;
   const cart_item_drift_model({
     required this.productCode,
     required this.productName,
@@ -261,6 +285,7 @@ class cart_item_drift_model extends DataClass
     this.brandName,
     this.categoryName,
     required this.addedAt,
+    required this.totalPrice,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -315,6 +340,7 @@ class cart_item_drift_model extends DataClass
       brandName: serializer.fromJson<String?>(json['brandName']),
       categoryName: serializer.fromJson<String?>(json['categoryName']),
       addedAt: serializer.fromJson<DateTime>(json['addedAt']),
+      totalPrice: serializer.fromJson<double>(json['totalPrice']),
     );
   }
   @override
@@ -329,6 +355,7 @@ class cart_item_drift_model extends DataClass
       'brandName': serializer.toJson<String?>(brandName),
       'categoryName': serializer.toJson<String?>(categoryName),
       'addedAt': serializer.toJson<DateTime>(addedAt),
+      'totalPrice': serializer.toJson<double>(totalPrice),
     };
   }
 
@@ -341,6 +368,7 @@ class cart_item_drift_model extends DataClass
     Value<String?> brandName = const Value.absent(),
     Value<String?> categoryName = const Value.absent(),
     DateTime? addedAt,
+    double? totalPrice,
   }) => cart_item_drift_model(
     productCode: productCode ?? this.productCode,
     productName: productName ?? this.productName,
@@ -352,30 +380,8 @@ class cart_item_drift_model extends DataClass
     brandName: brandName.present ? brandName.value : this.brandName,
     categoryName: categoryName.present ? categoryName.value : this.categoryName,
     addedAt: addedAt ?? this.addedAt,
+    totalPrice: totalPrice ?? this.totalPrice,
   );
-  cart_item_drift_model copyWithCompanion(CartItemDriftModelCompanion data) {
-    return cart_item_drift_model(
-      productCode: data.productCode.present
-          ? data.productCode.value
-          : this.productCode,
-      productName: data.productName.present
-          ? data.productName.value
-          : this.productName,
-      productImageUrl: data.productImageUrl.present
-          ? data.productImageUrl.value
-          : this.productImageUrl,
-      productPrice: data.productPrice.present
-          ? data.productPrice.value
-          : this.productPrice,
-      quantity: data.quantity.present ? data.quantity.value : this.quantity,
-      brandName: data.brandName.present ? data.brandName.value : this.brandName,
-      categoryName: data.categoryName.present
-          ? data.categoryName.value
-          : this.categoryName,
-      addedAt: data.addedAt.present ? data.addedAt.value : this.addedAt,
-    );
-  }
-
   @override
   String toString() {
     return (StringBuffer('cart_item_drift_model(')
@@ -386,7 +392,8 @@ class cart_item_drift_model extends DataClass
           ..write('quantity: $quantity, ')
           ..write('brandName: $brandName, ')
           ..write('categoryName: $categoryName, ')
-          ..write('addedAt: $addedAt')
+          ..write('addedAt: $addedAt, ')
+          ..write('totalPrice: $totalPrice')
           ..write(')'))
         .toString();
   }
@@ -401,6 +408,7 @@ class cart_item_drift_model extends DataClass
     brandName,
     categoryName,
     addedAt,
+    totalPrice,
   );
   @override
   bool operator ==(Object other) =>
@@ -413,7 +421,8 @@ class cart_item_drift_model extends DataClass
           other.quantity == this.quantity &&
           other.brandName == this.brandName &&
           other.categoryName == this.categoryName &&
-          other.addedAt == this.addedAt);
+          other.addedAt == this.addedAt &&
+          other.totalPrice == this.totalPrice);
 }
 
 class CartItemDriftModelCompanion
@@ -635,6 +644,11 @@ class $$CartItemDriftModelTableFilterComposer
     column: $table.addedAt,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<double> get totalPrice => $composableBuilder(
+    column: $table.totalPrice,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$CartItemDriftModelTableOrderingComposer
@@ -685,6 +699,11 @@ class $$CartItemDriftModelTableOrderingComposer
     column: $table.addedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get totalPrice => $composableBuilder(
+    column: $table.totalPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CartItemDriftModelTableAnnotationComposer
@@ -729,6 +748,11 @@ class $$CartItemDriftModelTableAnnotationComposer
 
   GeneratedColumn<DateTime> get addedAt =>
       $composableBuilder(column: $table.addedAt, builder: (column) => column);
+
+  GeneratedColumn<double> get totalPrice => $composableBuilder(
+    column: $table.totalPrice,
+    builder: (column) => column,
+  );
 }
 
 class $$CartItemDriftModelTableTableManager

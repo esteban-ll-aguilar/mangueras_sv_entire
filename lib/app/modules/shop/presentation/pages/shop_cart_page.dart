@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
-import 'package:mangueras_sv_entire/app/modules/shop/presentation/providers/cart_providers.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/cart_providers.dart';
+import 'package:mangueras_sv_entire/core/core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Página del carrito de compras
@@ -129,8 +130,8 @@ class ShopCartPage extends ConsumerWidget {
   ) async {
     // Construir mensaje para WhatsApp
     final buffer = StringBuffer();
-    buffer.writeln('🛒 *PEDIDO - Mangueras SV*\n');
-    buffer.writeln('📋 *Detalle del pedido:*\n');
+    buffer.writeln('*PEDIDO - Mangueras SV*\n');
+    buffer.writeln('*Detalle del pedido:*\n');
 
     double total = 0.0;
     for (var item in items) {
@@ -138,27 +139,25 @@ class ShopCartPage extends ConsumerWidget {
       total += itemTotal;
 
       buffer.writeln('━━━━━━━━━━━━━━━');
-      buffer.writeln('📦 *Producto:* ${item.productName}');
-      buffer.writeln('🔢 *Código:* ${item.productCode}');
+      buffer.writeln('*Producto:* ${item.productName}');
+      buffer.writeln('*Código:* ${item.productCode}');
       if (item.brandName != null) {
-        buffer.writeln('🏷️ *Marca:* ${item.brandName}');
+        buffer.writeln('*Marca:* ${item.brandName}');
       }
       if (item.categoryName != null) {
-        buffer.writeln('📁 *Categoría:* ${item.categoryName}');
+        buffer.writeln('*Categoría:* ${item.categoryName}');
       }
       buffer.writeln(
-        '💰 *Precio unitario:* \$${item.productPrice.toStringAsFixed(2)}',
+        '*Precio unitario:* \$${item.productPrice.toStringAsFixed(2)}',
       );
-      buffer.writeln('🔢 *Cantidad:* ${item.quantity}');
-      buffer.writeln('💵 *Subtotal:* \$${itemTotal.toStringAsFixed(2)}\n');
+      buffer.writeln('*Cantidad:* ${item.quantity}');
+      buffer.writeln('*Subtotal:* \$${itemTotal.toStringAsFixed(2)}\n');
     }
 
     buffer.writeln('━━━━━━━━━━━━━━━');
-    buffer.writeln('💰 *TOTAL: \$${total.toStringAsFixed(2)}*');
-    buffer.writeln('\n📞 _Esperamos su confirmación_');
+    buffer.writeln('*TOTAL: \$${total.toStringAsFixed(2)}*');
+    buffer.writeln('\n _Esperamos su confirmación_');
 
-    // Número de WhatsApp (reemplazar con el número real)
-    const phoneNumber = '593999999999'; // TODO: Configurar número real
 
     // Codificar mensaje para URL
     final encodedMessage = Uri.encodeComponent(buffer.toString());

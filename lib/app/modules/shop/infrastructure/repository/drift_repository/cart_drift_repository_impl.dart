@@ -13,7 +13,7 @@ class CartDriftRepositoryImpl implements CartRepository {
   @override
   Future<List<CartItemModel>> getAllCartItems() async {
     final items = await _database.select(_database.cartItemDriftModel).get();
-    
+
     return items.map((item) {
       return CartItemModel(
         productCode: item.productCode,
@@ -36,20 +36,24 @@ class CartDriftRepositoryImpl implements CartRepository {
     String? categoryName,
   }) async {
     // Verificar si el producto ya existe en el carrito
-    final existingItem = await (_database.select(_database.cartItemDriftModel)
-          ..where((tbl) => tbl.productCode.equals(product.code)))
-        .getSingleOrNull();
+    final existingItem = await (_database.select(
+      _database.cartItemDriftModel,
+    )..where((tbl) => tbl.productCode.equals(product.code))).getSingleOrNull();
 
     if (existingItem != null) {
       // Si existe, actualizar la cantidad
-      await (_database.update(_database.cartItemDriftModel)
-            ..where((tbl) => tbl.productCode.equals(product.code)))
-          .write(CartItemDriftModelCompanion(
-        quantity: Value(existingItem.quantity + quantity),
-      ));
+      await (_database.update(
+        _database.cartItemDriftModel,
+      )..where((tbl) => tbl.productCode.equals(product.code))).write(
+        CartItemDriftModelCompanion(
+          quantity: Value(existingItem.quantity + quantity),
+        ),
+      );
     } else {
       // Si no existe, insertar nuevo item
-      await _database.into(_database.cartItemDriftModel).insert(
+      await _database
+          .into(_database.cartItemDriftModel)
+          .insert(
             CartItemDriftModelCompanion.insert(
               productCode: product.code,
               productName: product.name,
@@ -64,7 +68,10 @@ class CartDriftRepositoryImpl implements CartRepository {
   }
 
   @override
-  Future<void> updateCartItemQuantity(String productCode, int newQuantity) async {
+  Future<void> updateCartItemQuantity(
+    String productCode,
+    int newQuantity,
+  ) async {
     if (newQuantity <= 0) {
       await removeFromCart(productCode);
       return;
@@ -72,16 +79,14 @@ class CartDriftRepositoryImpl implements CartRepository {
 
     await (_database.update(_database.cartItemDriftModel)
           ..where((tbl) => tbl.productCode.equals(productCode)))
-        .write(CartItemDriftModelCompanion(
-      quantity: Value(newQuantity),
-    ));
+        .write(CartItemDriftModelCompanion(quantity: Value(newQuantity)));
   }
 
   @override
   Future<void> removeFromCart(String productCode) async {
-    await (_database.delete(_database.cartItemDriftModel)
-          ..where((tbl) => tbl.productCode.equals(productCode)))
-        .go();
+    await (_database.delete(
+      _database.cartItemDriftModel,
+    )..where((tbl) => tbl.productCode.equals(productCode))).go();
   }
 
   @override
@@ -91,16 +96,25 @@ class CartDriftRepositoryImpl implements CartRepository {
 
   @override
   Future<int> getCartItemsCount() async {
-    final items = await _database.select(_database.cartItemDriftModel).get();
-    return items.fold<int>(0, (sum, item) => sum + item.quantity);
+    final countExp = _database.cartItemDriftModel.productCode.count();
+    final query = _database.selectOnly(_database.cartItemDriftModel)
+      ..addColumns([countExp]);
+    final result = await query.getSingle();
+    return result.read(countExp) ?? 0;
   }
 
   @override
+  /// - Obtiene el total del carrito a partir del precio total de cada item
+  /// - Si el carrito está vacío, retorna 0.0
+  /// - Utiliza una consulta SQL para sumar los precios totales de los items
+  /// - Retorna el total como un valor double
+  /// - Ejemplo: Si hay 2 items con precios totales de 10.0 y 15.5, retorna 25.5
   Future<double> getCartTotal() async {
-    final items = await _database.select(_database.cartItemDriftModel).get();
-    return items.fold<double>(
-      0.0,
-      (sum, item) => sum + (item.productPrice * item.quantity),
-    );
+    final totalExp = _database.cartItemDriftModel.totalPrice.sum();
+    final query = _database.selectOnly(_database.cartItemDriftModel)
+      ..addColumns([totalExp]);
+    final row = await query.getSingleOrNull();
+    final double? total = row?.read(totalExp);
+    return total ?? 0.0;
   }
 }

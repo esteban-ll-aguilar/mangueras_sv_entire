@@ -6,14 +6,23 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mangueras_sv_entire/core/routes/admin_routes.dart';
+import 'package:mangueras_sv_entire/core/routes/common_router.dart';
 
 import 'package:mangueras_sv_entire/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await dotenv.load(fileName: ".env");
+
+    final isAdmin = dotenv.env['FLAVOR'] == 'admin';
+
+    final routes = isAdmin ? adminRouterProvider : commonRouterProvider;
+
+    await tester.pumpWidget(MyApp(routes: routes));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

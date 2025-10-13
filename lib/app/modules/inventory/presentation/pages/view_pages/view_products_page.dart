@@ -14,7 +14,7 @@ class ProductsPage extends ConsumerStatefulWidget {
 }
 
 class _ProductsPageState extends ConsumerState<ProductsPage> {
-  Future<List<Map<String, dynamic>>>? _productsFuture; // Cambiar tipo
+  Future<List<ProductModel>>? _productsFuture; // Cambiar tipo
   String _query = '';
   String _selectedCategoryId = '';
   String _selectedBrandId = '';
@@ -33,9 +33,9 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
     _productsFuture = _loadProducts();
   }
 
-  Future<List<Map<String, dynamic>>> _loadProducts() async {
+  Future<List<ProductModel>> _loadProducts() async {
     final repo = ref.read(inventoryProductRepositoryProvider);
-    return repo.getAllProductsWithDetails(); // Usar el nuevo método
+    return repo.getAllProducts();
   }
 
   Future<void> _refresh() async {
@@ -45,16 +45,16 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
     await _productsFuture;
   }
 
-  List<Map<String, dynamic>> _filterProducts(List<Map<String, dynamic>> products) {
+  List<ProductModel> _filterProducts(List<ProductModel> products) {
     var filtered = products;
 
     // Filtro por búsqueda
     if (_query.trim().isNotEmpty) {
       final q = _query.toLowerCase();
       filtered = filtered.where((p) {
-        final name = (p['name'] ?? '').toString().toLowerCase();
-        final description = (p['description'] ?? '').toString().toLowerCase();
-        final code = (p['code'] ?? '').toString().toLowerCase();
+        final name = (p.name).toString().toLowerCase();
+        final description = (p.description).toString().toLowerCase();
+        final code = (p.code).toString().toLowerCase();
         return name.contains(q) || description.contains(q) || code.contains(q);
       }).toList();
     }
@@ -62,9 +62,8 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
     // CORRECCIÓN: Filtro por categoría usando la información completa
     if (_selectedCategoryId.isNotEmpty) {
       filtered = filtered.where((p) {
-        final brandCategory = p['brand_category'];
-        if (brandCategory != null) {
-          return brandCategory['category_id'] == _selectedCategoryId;
+        if (p.categoryId != null) {
+          return p.categoryId == _selectedCategoryId;
         }
         return false;
       }).toList();
@@ -73,9 +72,8 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
     // CORRECCIÓN: Filtro por marca usando la información completa
     if (_selectedBrandId.isNotEmpty) {
       filtered = filtered.where((p) {
-        final brandCategory = p['brand_category'];
-        if (brandCategory != null) {
-          return brandCategory['brand_id'] == _selectedBrandId;
+        if (p.brandId != null) {
+          return p.brandId == _selectedBrandId;
         }
         return false;
       }).toList();
@@ -83,18 +81,18 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
 
     // Filtro por precio
     filtered = filtered.where((p) {
-      final price = (p['price'] ?? 0).toDouble();
+      final price = (p.price).toDouble();
       return price >= _minPrice && price <= _maxPrice;
     }).toList();
 
     // Filtro por stock
     if (_showOnlyInStock) {
-      filtered = filtered.where((p) => ((p['stock_quantity'] ?? 0) as int) > 0).toList();
+      filtered = filtered.where((p) => (p.stockQuantity) > 0).toList();
     }
 
     // Filtro por activos
     if (_showOnlyActive) {
-      filtered = filtered.where((p) => (p['is_active'] ?? false) == true).toList();
+      filtered = filtered.where((p) => (p.isActive) == true).toList();
     }
 
     // CORRECCIÓN: Ordenamiento actualizado
@@ -102,16 +100,16 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
       int comparison = 0;
       switch (_sortBy) {
         case 'name':
-          comparison = (a['name'] ?? '').toString().compareTo((b['name'] ?? '').toString());
+          comparison = (a.name).toString().compareTo((b.name).toString());
           break;
         case 'price':
-          comparison = ((a['price'] ?? 0) as num).compareTo((b['price'] ?? 0) as num);
+          comparison = ((a.price) as num).compareTo((b.price) as num);
           break;
         case 'stock':
-          comparison = ((a['stock_quantity'] ?? 0) as int).compareTo((b['stock_quantity'] ?? 0) as int);
+          comparison = ((a.stockQuantity) as int).compareTo((b.stockQuantity) as int);
           break;
         case 'code':
-          comparison = (a['code'] ?? '').toString().compareTo((b['code'] ?? '').toString());
+          comparison = (a.code).toString().compareTo((b.code).toString());
           break;
       }
       return _sortAscending ? comparison : -comparison;
@@ -172,7 +170,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
       ),
       body: RefreshIndicator(
         onRefresh: _refresh,
-        child: FutureBuilder<List<Map<String, dynamic>>>(
+        child: FutureBuilder<List<ProductModel>>(
           future: _productsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -201,12 +199,12 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
               itemCount: filteredProducts.length,
               itemBuilder: (context, index) {
                 final productData = filteredProducts[index];
-                final product = ProductModel.fromJson(productData);
+                final product = productData;
                 
                 return ProductCard(
                   product: product,
-                  brandName: _getBrandName(productData),
-                  categoryName: _getCategoryName(productData),
+                  brandName: product.brandName ?? 'Sin marca',
+                  categoryName: product.categoryName ?? 'Sin categoría',
                   onTap: () => _editProduct(product),
                   onToggleActive: () => _toggleProductStatus(product),
                 );
@@ -765,22 +763,6 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
         ),
       );
     }
-  }
-
-  String _getBrandName(Map<String, dynamic> productData) {
-    final brandCategory = productData['brand_category'];
-    if (brandCategory != null && brandCategory['brand'] != null) {
-      return brandCategory['brand']['name'] ?? 'Sin marca';
-    }
-    return 'Sin marca';
-  }
-
-  String _getCategoryName(Map<String, dynamic> productData) {
-    final brandCategory = productData['brand_category'];
-    if (brandCategory != null && brandCategory['category'] != null) {
-      return brandCategory['category']['name'] ?? 'Sin categoría';
-    }
-    return 'Sin categoría';
   }
 
   Widget _buildLoadingState() {

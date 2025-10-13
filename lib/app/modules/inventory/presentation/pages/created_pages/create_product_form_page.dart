@@ -10,7 +10,8 @@ import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/provide
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/inventory_storage_repository_impl.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/inventory_reusable_widgets.dart';
 import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
-import 'package:mangueras_sv_entire/core/routes/router.dart';
+import 'package:mangueras_sv_entire/core/routes/admin_routes.dart';
+import 'package:mangueras_sv_entire/core/routes/common_router.dart';
 
 class CreateProductsFormPage extends ConsumerStatefulWidget {
   const CreateProductsFormPage({Key? key}) : super(key: key);
@@ -243,7 +244,7 @@ class _CreateProductsFormPageState
       appBar: AppBar(
         leading: AuthReusableWidgets.backButton(
           context,
-          routeName: AppRouterNames.home.name,
+          routeName: AdminAppRouterNames.home.name,
         ),
         title: const Text('Añadir Productos'),
       ),

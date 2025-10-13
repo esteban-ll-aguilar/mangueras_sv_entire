@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/domain/models/drift_models/shop_drift_models.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/drift_models/inventory_drift_models.dart';
 import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
 import 'connection/connection.dart';
 part 'app_local_database.g.dart';

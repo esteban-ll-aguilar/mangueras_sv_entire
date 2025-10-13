@@ -24,9 +24,27 @@ class ProductRepositoryImpl extends ProductRepository {
   }
 
   @override
+  /// Obtiene todos los productos desde la vista 'products_view_flat'
+  /// Estructura del JSON devuelto por la vista:
+  ///
+  /// {
+  ///    "code":,
+  ///    "name":"",
+  ///    "description":"",
+  ///    "image_url":"",
+  ///    "price": 0,
+  ///    "stock_quantity": 0,
+  ///    "is_active":true,
+  ///    "brand_category_id": "",
+  ///    "brand_id": "",
+  ///    "brand_name":"",
+  ///    "category_id": "",
+  ///    "category_name":""
+  /// }
   Future<List<ProductModel>> getAllProducts() async {
     try {
-      final response = await _supabase.from(supabaseTablesNames.productTable.value).select();
+      final response = await _supabase.from('products_view_flat').select();
+      // logging.d('Response from products_view_flat: ${response[0]}');
       final products = (response as List)
           .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -41,7 +59,7 @@ class ProductRepositoryImpl extends ProductRepository {
   Future<ProductModel?> getProductById(String id) async {
     try {
       final response = await _supabase
-          .from(supabaseTablesNames.productTable.value)
+          .from('products_view_flat')
           .select()
           .eq('code', id)
           .single();
@@ -56,7 +74,7 @@ class ProductRepositoryImpl extends ProductRepository {
   Future<List<ProductModel>> getProductsByName(String name) async {
     try {
       final response = await _supabase
-          .from(supabaseTablesNames.productTable.value)
+          .from('products_view_flat')
           .select()
           .like('name', '%$name%');
       return (response as List)
@@ -75,7 +93,7 @@ class ProductRepositoryImpl extends ProductRepository {
   ) async {
     try {
       final response = await _supabase
-          .from(supabaseTablesNames.productTable.value)
+          .from('products_view_flat')
           .update(productData)
           .eq('code', productId)
           .select()
@@ -91,10 +109,10 @@ class ProductRepositoryImpl extends ProductRepository {
   Future<List<ProductModel>> getAllProductsByBrandId(String brandId) async {
     try {
       final response = await _supabase
-          .from(supabaseTablesNames.productTable.value)
-          .select('*, brand_category!inner(brand_id)')
-          .eq('brand_category.brand_id', brandId);
-          
+          .from('products_view_flat')
+          .select()
+          .eq('brand_id', brandId);
+
       final products = (response as List)
           .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -106,13 +124,53 @@ class ProductRepositoryImpl extends ProductRepository {
   }
 
   @override
-  Future<List<ProductModel>> getAllProductsByCategoryId(String categoryId) async {
+  Future<List<ProductModel>> getAllFilteredProducts({
+    String? productName,
+    bool? isActive,
+    Set<String>? brandIds,
+    Set<String>? categoryIds,
+
+  }) async {
+    try {
+      var query = _supabase
+          .from('products_view_flat')
+          .select();
+          if (productName != null && productName.isNotEmpty) {
+            query = query.or('name.ilike.%$productName%,code.ilike.%$productName%');
+          }
+          if (brandIds != null && brandIds.isNotEmpty) {
+            query = query.inFilter('brand_id', brandIds.toList());
+          }
+          if (categoryIds != null && categoryIds.isNotEmpty) {
+            query = query.inFilter('category_id', categoryIds.toList());
+          }
+          if (isActive != null) {
+            query = query.eq('is_active', isActive);
+          }
+
+          query.order('name', ascending: true);
+          final response = await query;
+
+      final products = (response as List)
+          .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      return products;
+    } catch (e) {
+      logging.e('Error fetching all products by brand: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<List<ProductModel>> getAllProductsByCategoryId(
+    String categoryId,
+  ) async {
     try {
       final response = await _supabase
-          .from(supabaseTablesNames.productTable.value)
-          .select('*, brand_category!inner(category_id)')
-          .eq('brand_category.category_id', categoryId);
-          
+          .from('products_view_flat')
+          .select()
+          .eq('category_id', categoryId);
+
       final products = (response as List)
           .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -122,19 +180,4 @@ class ProductRepositoryImpl extends ProductRepository {
       return [];
     }
   }
-  @override
-  Future<List<Map<String, dynamic>>> getAllProductsWithDetails() async {
-    try {
-      final response = await _supabase
-          .from(supabaseTablesNames.productTable.value)
-          .select('*, brand_category!inner(*, brand(*), category(*))')
-          .order('name', ascending: true);
-          
-      return List<Map<String, dynamic>>.from(response);
-    } catch (e) {
-      logging.e('Error fetching all products with details: $e');
-      return [];
-    }
-  }
-
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
-import 'package:mangueras_sv_entire/app/modules/shop/presentation/providers/shop_providers.dart';
+import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/notifiers/shop_providers_notifiers.dart';
 
 /// Widget del sidebar con filtros de marcas y categorías
 class ShopFiltersSidebar extends ConsumerWidget {
@@ -14,7 +14,19 @@ class ShopFiltersSidebar extends ConsumerWidget {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _SearchField(),
+          // _SearchField(),
+          //Botones de Acción
+          Column(
+            children: [
+              TextButton.icon(
+                onPressed: () {
+                },
+                icon: const Icon(Icons.home, color: Colors.black87),
+                label: const Text('Ir a Inicio', style: TextStyle(color: Colors.black87)),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
           const SizedBox(height: 24),
           _BrandFilters(),
           const Divider(height: 32),
@@ -31,7 +43,7 @@ class _SearchField extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return TextField(
       decoration: InputDecoration(
-        hintText: 'Buscar productos...',
+        hintText: 'Buscar Marcas o Categorías...',
         prefixIcon: const Icon(Icons.search, size: 20),
         filled: true,
         fillColor: Colors.grey[100],

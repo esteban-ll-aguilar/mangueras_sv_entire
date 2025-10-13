@@ -12,11 +12,9 @@ import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/cre
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_product_form_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_brands_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_categories_page.dart';
-import 'package:mangueras_sv_entire/app/modules/shop/presentation/pages/shop_products_page.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/presentation/pages/shop_welcome_page.dart';
-import 'package:mangueras_sv_entire/app/modules/shop/presentation/pages/shop_cart_page.dart';
 
-enum AppRouterNames {
+enum AdminAppRouterNames {
   login,
   signup,
   welcome,
@@ -29,13 +27,11 @@ enum AppRouterNames {
   categories,
   shopCategories,
   brands,
-  createUsers,
-  shopProducts,
-  shopCart,
+  createUsers
 }
 
-final routerProvider = Provider<GoRouter>((ref) {
-  final router = RouterNotifier(ref);
+final adminRouterProvider = Provider<GoRouter>((ref) {
+  final router = AdminRouterNotifier(ref);
   return GoRouter(
     refreshListenable: router,
     redirect: router._redirect,
@@ -43,11 +39,11 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-class RouterNotifier extends ChangeNotifier {
+class AdminRouterNotifier extends ChangeNotifier {
   // Simulated authentication state
   final Ref _ref;
 
-  RouterNotifier(this._ref) {
+  AdminRouterNotifier(this._ref) {
     _ref.listen(authProvider, (_, __) => notifyListeners());
   }
 
@@ -87,63 +83,53 @@ class RouterNotifier extends ChangeNotifier {
   List<RouteBase> get _routes => [
     GoRoute(
       path: '/',
-      name: AppRouterNames.welcome.name,
+      name: AdminAppRouterNames.welcome.name,
       builder: (context, state) => ShopWelcomePage(),
     ),
     GoRoute(
       path: '/login',
-      name: AppRouterNames.login.name,
+      name: AdminAppRouterNames.login.name,
       builder: (context, state) => const LoginPage(),
     ),
     GoRoute(
       path: '/forgot-password',
-      name: AppRouterNames.forgotPassword.name,
+      name: AdminAppRouterNames.forgotPassword.name,
       builder: (context, state) => const ForgotPasswordPage(),
     ),
     GoRoute(
       path: '/home',
-      name: AppRouterNames.home.name,
+      name: AdminAppRouterNames.home.name,
       builder: (context, state) => const HomePage(),
     ),
     GoRoute(
       path: '/create-brands',
-      name: AppRouterNames.createBrands.name,
+      name: AdminAppRouterNames.createBrands.name,
       builder: (context, state) => const CreateBrandsFormPage(),
     ),
     GoRoute(
       path: '/create-categories',
-      name: AppRouterNames.createCategories.name,
+      name: AdminAppRouterNames.createCategories.name,
       builder: (context, state) => const CreateCategoriesFormPage(),
     ),
     GoRoute(
       path: '/create-products',
-      name: AppRouterNames.createProducts.name,
+      name: AdminAppRouterNames.createProducts.name,
       builder: (context, state) => const CreateProductsFormPage(),
     ),
     GoRoute(
       path: '/categories',
-      name: AppRouterNames.categories.name,
+      name: AdminAppRouterNames.categories.name,
       builder: (context, state) => const CategoriesPage(),
     ),
     GoRoute(
       path: '/brands',
-      name: AppRouterNames.brands.name,
+      name: AdminAppRouterNames.brands.name,
       builder: (context, state) => const BrandsPage(),
     ),
     GoRoute(
       path: '/create-users',
-      name: AppRouterNames.createUsers.name,
+      name: AdminAppRouterNames.createUsers.name,
       builder: (context, state) => const CreateUserForm(),
-    ),
-    GoRoute(
-      path: '/shop/products',
-      name: AppRouterNames.shopProducts.name,
-      builder: (context, state) => ShopProductsPage(),
-    ),
-    GoRoute(
-      path: '/shop/cart',
-      name: AppRouterNames.shopCart.name,
-      builder: (context, state) => ShopCartPage(),
-    ),
+    )
   ];
 }
