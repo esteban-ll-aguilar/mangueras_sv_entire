@@ -138,17 +138,6 @@ class _ProductsToolbar extends StatelessWidget {
               },
             ),
           ),
-          if (!isMobile)
-            Row(
-              children: [
-                if (hasActiveFilters)
-                  TextButton(
-                    onPressed: onClearFilters,
-                    style: TextButton.styleFrom(foregroundColor: Colors.red),
-                    child: const Text('Limpiar filtros'),
-                  ),
-              ],
-            ),
         ],
       ),
     );

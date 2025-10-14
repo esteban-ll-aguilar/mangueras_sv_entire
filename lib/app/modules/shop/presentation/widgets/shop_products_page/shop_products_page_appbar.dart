@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/presentation/widgets/shop_products_page/shop_products_page_widgets.dart';
 
@@ -33,10 +34,13 @@ class ShopProductsPageAppbar extends StatelessWidget implements PreferredSizeWid
           child: Row(
             children: [
               // Logo
-              Image.asset(
-                'assets/logo.png', // Cambia por tu ruta
-                height: 70,
-                width: 70,
+              GestureDetector(
+                onTap: () => context.go('/'),
+                child: Image.asset(
+                  'assets/logo.png',
+                  height: isDesktop ? 70 : 50,
+                  width: isDesktop ? 70 : 50,
+                ),
               ),
               
               // Barra de búsqueda
@@ -82,7 +86,7 @@ class _SearchProductsField extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return TextField(
       decoration: InputDecoration(
-        hintText: 'Buscar Marcas o Categorías...',
+        hintText: 'Buscar Productos por Nombre o Codigo...',
         prefixIcon: const Icon(Icons.search, size: 20),
         filled: true,
         fillColor: Colors.grey[100],
