@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/infrastructure/providers/authProvider.dart';
 import 'package:mangueras_sv_entire/core/routes/admin_routes.dart';
-import 'package:mangueras_sv_entire/core/routes/common_router.dart';
 
 class AuthWelcomePage extends ConsumerStatefulWidget {
   const AuthWelcomePage({Key? key, this.title}) : super(key: key);

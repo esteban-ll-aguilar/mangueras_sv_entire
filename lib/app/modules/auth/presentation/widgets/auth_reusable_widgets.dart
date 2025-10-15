@@ -10,11 +10,19 @@ class AuthReusableWidgets {
     );
   }
 
-  static Widget title({required String titleText, required String subtitleText}) {
+  static Widget title({
+    required String titleText,
+    required String subtitleText,
+    bool isTitleCentered = true,
+  }) {
     return Column(
+      crossAxisAlignment: isTitleCentered
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
         Text(
           titleText,
+          textAlign: isTitleCentered ? TextAlign.center : TextAlign.start,
           style: GoogleFonts.poppins(
             fontSize: 32,
             fontWeight: FontWeight.w700,
@@ -24,10 +32,8 @@ class AuthReusableWidgets {
         const SizedBox(height: 8),
         Text(
           subtitleText,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey.shade600,
-          ),
+          textAlign: isTitleCentered ? TextAlign.center : TextAlign.start,
+          style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
         ),
       ],
     );
@@ -91,7 +97,9 @@ class AuthReusableWidgets {
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: isLoading ? null : onTap, // Desactiva el botón si está cargando
+        onPressed: isLoading
+            ? null
+            : onTap, // Desactiva el botón si está cargando
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,
@@ -105,10 +113,13 @@ class AuthReusableWidgets {
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               )
             : child ?? // Si se proporciona un widget personalizado, úsalo
-                Text(
-                  text ?? '',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
+                  Text(
+                    text ?? '',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
       ),
     );
   }

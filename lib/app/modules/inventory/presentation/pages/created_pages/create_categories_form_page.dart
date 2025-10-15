@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/widgets/auth_reusable_widgets.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/category_model.dart';
@@ -10,7 +11,6 @@ import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/reposit
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/inventory_reusable_widgets.dart';
 import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
 import 'package:mangueras_sv_entire/core/routes/admin_routes.dart';
-import 'package:mangueras_sv_entire/core/routes/common_router.dart';
 
 class CreateCategoriesFormPage extends ConsumerStatefulWidget {
   const CreateCategoriesFormPage({Key? key}) : super(key: key);
@@ -20,7 +20,8 @@ class CreateCategoriesFormPage extends ConsumerStatefulWidget {
       _CreateCategoriesFormPageState();
 }
 
-class _CreateCategoriesFormPageState extends ConsumerState<CreateCategoriesFormPage> {
+class _CreateCategoriesFormPageState
+    extends ConsumerState<CreateCategoriesFormPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameCtrl = TextEditingController();
   final TextEditingController _descriptionCtrl = TextEditingController();
@@ -38,7 +39,6 @@ class _CreateCategoriesFormPageState extends ConsumerState<CreateCategoriesFormP
     super.dispose();
   }
 
-
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -48,7 +48,6 @@ class _CreateCategoriesFormPageState extends ConsumerState<CreateCategoriesFormP
       final storageRepo = ref.read(inventoryStorageRepositoryProvider);
       final categoryRepo = ref.read(inventoryBrandCategoryRepositoryProvider);
 
-      // Crear la categoría sin imagen (supongo que createCategory devuelve el CategoryModel con id asignado)
       final created = await categoryRepo.createCategory(
         CategoryModel(
           id: '',
@@ -58,14 +57,14 @@ class _CreateCategoriesFormPageState extends ConsumerState<CreateCategoriesFormP
       );
 
       if (created == null) {
-        throw Exception('No se pudo crear la categoría, revisa que no exista ya');
+        throw Exception(
+            'No se pudo crear la categoría, revisa que no exista ya');
       }
 
       String? uploadedFileName;
       String? publicUrl;
 
       if (_imageBytes != null && _imageFileName != null) {
-        // Subir imagen y obtener nombre de archivo en storage
         uploadedFileName = await storageRepo.uploadImage(
           StorageFolder.categoryImages,
           created.id,
@@ -73,7 +72,6 @@ class _CreateCategoriesFormPageState extends ConsumerState<CreateCategoriesFormP
           _imageFileName!,
         );
 
-        // Obtener URL pública y actualizar la categoría
         publicUrl = await storageRepo.getImageUrl(uploadedFileName);
         logging.i('Imagen subida: ${created.id} - $publicUrl');
         await categoryRepo.updateCategory(created.id, {'image_url': publicUrl});
@@ -81,9 +79,18 @@ class _CreateCategoriesFormPageState extends ConsumerState<CreateCategoriesFormP
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Categoría creada correctamente')),
+          SnackBar(
+            content: Text(
+              'Categoría creada correctamente',
+              style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+            ),
+            backgroundColor: Colors.green.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
         );
-        // Eliminar field values
         _formKey.currentState!.reset();
         setState(() {
           _imageBytes = null;
@@ -95,7 +102,17 @@ class _CreateCategoriesFormPageState extends ConsumerState<CreateCategoriesFormP
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar: $e')),
+          SnackBar(
+            content: Text(
+              'Error al guardar: $e',
+              style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+            ),
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
         );
       }
     } finally {
@@ -105,115 +122,366 @@ class _CreateCategoriesFormPageState extends ConsumerState<CreateCategoriesFormP
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isWeb = size.width > 900;
+    final isTablet = size.width > 600 && size.width <= 900;
+
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        leading: AuthReusableWidgets.backButton(
-          context,
-          routeName: AdminAppRouterNames.home.name,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: AuthReusableWidgets.backButton(
+            context,
+            routeName: AdminAppRouterNames.home.name,
+          ),
         ),
-        title: const Text('Añadir Categorías'),
+        title: Text(
+          'Añadir Categoría',
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Divider(
+            height: 1,
+            color: Colors.grey.shade200,
+          ),
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre',
-                  hintText: 'Ingrese el nombre de la categoría',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'El nombre es obligatorio' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _descriptionCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Descripción',
-                  hintText: 'Ingrese la descripción de la categoría',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 12),
-
-              // Vista previa de la imagen seleccionada
-              if (_imageBytes != null)
-                Column(
-                  children: [
-                    SizedBox(
-                      height: 150,
-                      child: Image.memory(_imageBytes!, fit: BoxFit.contain),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(_imageFileName ?? ''),
-                    const SizedBox(height: 8),
-                  ],
-                ),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        InventoryReusableWidgets.pickImage(
-                          imagePicker: _imagePicker,
-                          context: context,
-                          onImagePicked: (bytes, fileName) {
-                            setState(() {
-                              _imageBytes = bytes;
-                              _imageFileName = fileName;
-                            });
-                          },
-                          onError: (error) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Error al seleccionar imagen: $error',
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      icon: const Icon(Icons.photo_library),
-                      label: const Text('Seleccionar imagen'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          _imageBytes = null;
-                          _imageFileName = null;
-                        });
-                      },
-                      icon: const Icon(Icons.delete),
-                      label: const Text('Eliminar'),
-                    ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(isWeb ? 32 : 16),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: isWeb ? 600 : double.infinity,
+            ),
+            child: Container(
+              padding: EdgeInsets.all(isWeb ? 32 : 24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _submit,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Guardar'),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Text(
+                      'Información de la Categoría',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Complete los campos para crear una nueva categoría',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Campo Nombre
+                    Text(
+                      'Nombre *',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _nameCtrl,
+                      style: GoogleFonts.inter(fontSize: 15),
+                      decoration: InputDecoration(
+                        hintText: 'Ingrese el nombre de la categoría',
+                        hintStyle: GoogleFonts.inter(
+                          color: Colors.grey.shade400,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Colors.black, width: 2),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'El nombre es obligatorio'
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Campo Descripción
+                    Text(
+                      'Descripción',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _descriptionCtrl,
+                      style: GoogleFonts.inter(fontSize: 15),
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: 'Ingrese una descripción (opcional)',
+                        hintStyle: GoogleFonts.inter(
+                          color: Colors.grey.shade400,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Colors.black, width: 2),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Sección de Imagen
+                    Text(
+                      'Imagen',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Vista previa de la imagen
+                    if (_imageBytes != null)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                  maxHeight: 200,
+                                ),
+                                child: Image.memory(
+                                  _imageBytes!,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.image_outlined,
+                                  size: 16,
+                                  color: Colors.grey.shade600,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _imageFileName ?? 'Imagen seleccionada',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // Botones de imagen
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              InventoryReusableWidgets.pickImage(
+                                imagePicker: _imagePicker,
+                                context: context,
+                                onImagePicked: (bytes, fileName) {
+                                  setState(() {
+                                    _imageBytes = bytes;
+                                    _imageFileName = fileName;
+                                  });
+                                },
+                                onError: (error) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Error: $error',
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      backgroundColor: Colors.red.shade600,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              side: BorderSide(color: Colors.grey.shade300),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            icon: Icon(
+                              Icons.photo_library_outlined,
+                              size: 20,
+                              color: Colors.black87,
+                            ),
+                            label: Text(
+                              'Seleccionar',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (_imageBytes != null) ...[
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _imageBytes = null;
+                                  _imageFileName = null;
+                                });
+                              },
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                side:
+                                    BorderSide(color: Colors.red.shade300),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: Icon(
+                                Icons.delete_outline,
+                                size: 20,
+                                color: Colors.red.shade700,
+                              ),
+                              label: Text(
+                                'Eliminar',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.red.shade700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Botón Guardar
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _submit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          disabledBackgroundColor: Colors.grey.shade400,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                'Guardar Categoría',
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

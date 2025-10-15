@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/product_model.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/providers/inventory_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/edit_pages/edit_product_page.dart';
@@ -141,6 +142,12 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          onPressed: () => context.go('/home'),
+          tooltip: 'Volver',
+        ),
         title: const Text('Gestión de Productos'),
         centerTitle: true,
         elevation: 0,
@@ -216,7 +223,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Navegar a crear producto
-          Navigator.pushNamed(context, '/create-product');
+          context.go('/create-products');
         },
         child: const Icon(Icons.add),
         tooltip: 'Crear producto',

@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/infrastructure/providers/authProvider.dart';
+import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/auth_welcome_page.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/create_user_form.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/loginPage.dart';
-// import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/signUpPage.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/forgotPasswordPage.dart';
+// import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/signUpPage.dart';
 import 'package:mangueras_sv_entire/app/modules/home/presentation/pages/homePage.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_brands_form_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_categories_form_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_product_form_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_brands_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_categories_page.dart';
-import 'package:mangueras_sv_entire/app/modules/shop/presentation/pages/shop_welcome_page.dart';
+import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_products_page.dart';
 
 enum AdminAppRouterNames {
   login,
@@ -84,13 +85,18 @@ class AdminRouterNotifier extends ChangeNotifier {
     GoRoute(
       path: '/',
       name: AdminAppRouterNames.welcome.name,
-      builder: (context, state) => ShopWelcomePage(),
+      builder: (context, state) => AuthWelcomePage(),
     ),
     GoRoute(
       path: '/login',
       name: AdminAppRouterNames.login.name,
       builder: (context, state) => const LoginPage(),
     ),
+    // GoRoute(
+    //   path: '/signup',
+    //   name: AdminAppRouterNames.signup.name,
+    //   builder: (context, state) => const SignupPage(),
+    // ),
     GoRoute(
       path: '/forgot-password',
       name: AdminAppRouterNames.forgotPassword.name,
@@ -130,6 +136,11 @@ class AdminRouterNotifier extends ChangeNotifier {
       path: '/create-users',
       name: AdminAppRouterNames.createUsers.name,
       builder: (context, state) => const CreateUserForm(),
-    )
+    ),
+    GoRoute(
+      path: '/products',
+      name: AdminAppRouterNames.products.name,
+      builder: (context, state) => const ProductsPage(),
+    ),
   ];
 }

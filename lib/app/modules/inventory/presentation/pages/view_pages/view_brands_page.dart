@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/brand_model.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/providers/inventory_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/edit_pages/edit_brand_page.dart';
@@ -61,6 +62,12 @@ class _BrandsPageState extends ConsumerState<BrandsPage> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          onPressed: () => context.go('/home'),
+          tooltip: 'Volver',
+        ),
         title: const Text('Gestión de Marcas'),
         centerTitle: true,
         elevation: 0,

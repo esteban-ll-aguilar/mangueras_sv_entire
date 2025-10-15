@@ -183,9 +183,10 @@ class ShopFiltersSidebar extends ConsumerWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 const SizedBox(height: 8), // Pequeño espacio desde el header
-                _BrandFilters(),
-                const SizedBox(height: 20),
+                
                 _CategoryFilters(),
+                const SizedBox(height: 20),
+                _BrandFilters(),
                 const SizedBox(height: 40), // Espacio para el botón flotante
                 
                 // Footer informativo
@@ -389,9 +390,7 @@ class _CategoryFilters extends ConsumerWidget {
     return categoriesAsync.when(
       data: (categories) {
         // Filtrar solo categorías principales
-        final mainCategories = categories
-            .where((c) => c.isMainCategory)
-            .toList();
+        final mainCategories = categories.toList();
 
         return Container(
           padding: const EdgeInsets.all(16),

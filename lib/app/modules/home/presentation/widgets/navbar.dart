@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/infrastructure/providers/authProvider.dart';
 
 class ModernNavBar extends ConsumerStatefulWidget
@@ -17,138 +18,289 @@ class ModernNavBar extends ConsumerStatefulWidget
   ConsumerState<ModernNavBar> createState() => _ModernNavBarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(56);
+  Size get preferredSize => const Size.fromHeight(70);
 }
 
-class _ModernNavBarState extends ConsumerState<ModernNavBar>
-    with SingleTickerProviderStateMixin {
-  // bool _showNotificationPanel = false;
-  late AnimationController _pulseController;
-  // late Animation<double> _pulseAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    // _pulseAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
-    //   CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    // );
-
-    // Pulse animation for unread notifications
-    _pulseController.repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  // void _toggleNotificationPanel() {
-  //   if (_showNotificationPanel) {
-  //     setState(() {
-  //       _showNotificationPanel = false;
-  //     });
-  //   } else {
-  //     _showNotificationOverlay();
-  //   }
-  // }
-
-  // void _showNotificationOverlay() {
-  //   showGeneralDialog(
-  //     context: context,
-  //     barrierDismissible: true,
-  //     barrierLabel: 'Notification Panel',
-  //     barrierColor: Colors.black.withOpacity(0.3),
-  //     transitionDuration: const Duration(milliseconds: 300),
-  //     pageBuilder: (context, animation, secondaryAnimation) {
-  //       return Align(
-  //         alignment: Alignment.topCenter,
-  //         child: Container(
-  //           margin: EdgeInsets.only(
-  //             top: MediaQuery.of(context).padding.top + 56,
-  //             left: 16,
-  //             right: 16,
-  //           ),
-  //           child: Material(color: Colors.transparent, child: Container()),
-  //         ),
-  //       );
-  //     },
-  //     transitionBuilder: (context, animation, secondaryAnimation, child) {
-  //       return SlideTransition(
-  //         position: Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero)
-  //             .animate(
-  //               CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-  //             ),
-  //         child: FadeTransition(opacity: animation, child: child),
-  //       );
-  //     },
-  //   );
-  // }
+class _ModernNavBarState extends ConsumerState<ModernNavBar> {
+  bool _isHoveringLogout = false;
 
   @override
   Widget build(BuildContext context) {
-    // final unreadCount = 10; //TODO: Cambiar por unreadCount > 0
-    return Stack(
-      children: [
-        AppBar(
-          backgroundColor: widget.backgroundColor,
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          title: Row(
+    final size = MediaQuery.of(context).size;
+    final isWeb = size.width > 900;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: widget.backgroundColor,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isWeb ? 40 : 20,
+            vertical: 12,
+          ),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Logo a la izquierda con animación
-              Hero(
-                tag: 'app_logo',
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      widget.logoPath,
-                      height: 40,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
+              // Logo y nombre de la empresa
+              _buildLogoSection(isWeb),
 
-              // Ícono de notificaciones e imagen de perfil a la derecha
-              Row(
-                children: [
-                  TextButton.icon(
-                    onPressed: (){
-                      ref.read(authProvider.notifier).signOut();
-                    },
-                    icon: const Icon(Icons.logout, size: 28),
-                    label: const Text('Cerrar sesión'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.black, // ajustar color según fondo
-                      textStyle: const TextStyle(fontSize: 14),
-                    ),
-                  ),
-                ],
-              ),
+              // Acciones de usuario
+              _buildUserActions(isWeb),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLogoSection(bool isWeb) {
+    return Row(
+      children: [
+        // Logo
+        Container(
+          width: 45,
+          height: 45,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade200, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            clipBehavior: Clip.none,
+            child: OverflowBox(
+              maxWidth: 60,
+              maxHeight: 60,
+              child: Image.asset(
+                widget.logoPath,
+                fit: BoxFit.contain,
+              ),
+            )
+          ),
+        ),
+        if (isWeb) ...[
+          const SizedBox(width: 16),
+          // Nombre de la empresa
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Mangueras SV',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Panel de Administración',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                  height: 1,
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
+    );
+  }
+
+  Widget _buildUserActions(bool isWeb) {
+    return Row(
+      children: [
+        // Información del usuario (solo web)
+        if (isWeb) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.account_circle_outlined,
+                  size: 20,
+                  color: Colors.grey.shade700,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Administrador',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+        ],
+
+        // Botón de cerrar sesión
+        MouseRegion(
+          onEnter: (_) => setState(() => _isHoveringLogout = true),
+          onExit: (_) => setState(() => _isHoveringLogout = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            child: InkWell(
+              onTap: () {
+                _showLogoutConfirmation(context);
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isWeb ? 16 : 12,
+                  vertical: isWeb ? 12 : 10,
+                ),
+                decoration: BoxDecoration(
+                  color: _isHoveringLogout
+                      ? Colors.black
+                      : Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: _isHoveringLogout
+                        ? Colors.black
+                        : Colors.grey.shade300,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.logout_outlined,
+                      size: isWeb ? 20 : 18,
+                      color: _isHoveringLogout ? Colors.white : Colors.black87,
+                    ),
+                    if (isWeb) ...[
+                      const SizedBox(width: 8),
+                      Text(
+                        'Cerrar Sesión',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: _isHoveringLogout
+                              ? Colors.white
+                              : Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.logout_outlined,
+                  color: Colors.black87,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Cerrar Sesión',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            '¿Estás seguro de que deseas cerrar sesión?',
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              color: Colors.grey.shade700,
+              height: 1.5,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              child: Text(
+                'Cancelar',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                ref.read(authProvider.notifier).signOut();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'Cerrar Sesión',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
