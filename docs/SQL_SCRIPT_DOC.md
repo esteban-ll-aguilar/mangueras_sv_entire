@@ -1,7 +1,6 @@
 ``` sql
 -- SQL script to create tables for products, brands, and categories
 -- with Row Level Security (RLS) policies in PostgreSQL
-
 create table if not exists public.brand(
   id uuid primary key default gen_random_uuid() not null,
   name varchar(100) unique not null,
@@ -36,7 +35,6 @@ using ( true );
 CREATE POLICY "All users can view brands"
 ON public.brand 
 FOR SELECT 
-to authenticated
 using ( true );
 
 
@@ -46,6 +44,7 @@ create table if not exists public.category(
   id uuid primary key default gen_random_uuid() not null,
   name varchar(100) unique not null,
   description varchar(500),
+  is_main_category boolean default false not null,
   image_url text
 );
 -- . Crear INDICES
@@ -76,8 +75,49 @@ using ( true );
 CREATE POLICY "All users can view categories"
 ON public.category 
 FOR SELECT 
-to authenticated
 using ( true );
+
+
+
+-- TABLA INTERMEDIA
+create table if not exists public.brand_category(
+  id uuid primary key default gen_random_uuid() not null,
+  brand_id uuid references public.brand(id) on delete cascade not null,
+  category_id uuid references public.category(id) on delete cascade not null,
+  unique (brand_id, category_id) --evitar dublicados
+);
+
+create index if not exists idx_brand_category_brand_id_category_id on brand_category(brand_id,category_id);
+
+
+alter table public.brand_category enable row level security;
+
+create policy "Only users can insert relationship in brand y categories"
+on public.brand_category
+for insert
+to authenticated 
+with check (true);
+-- 
+create policy "Only users can delete relationship in brand y categories"
+on public.brand_category
+for delete
+to authenticated 
+using (true);
+
+create policy "Only users can update relationship in brand y categories"
+on public.brand_category
+for update
+to authenticated 
+using (true)
+with check (true);
+
+create policy "All user can view relationship in brand y categories"
+on public.brand_category
+FOR SELECT
+using (true);
+
+
+
 
 
 -- TABLA PRODUCTOS
@@ -86,8 +126,7 @@ create table if not exists public.product(
   name varchar(100) not null,
   description varchar(500),
   image_url text,
-  brand_id uuid references public.brand(id) on delete cascade not null ,
-  category_id uuid references public.category(id) on delete cascade not null ,
+  brand_category_id uuid references public.brand_category(id) on delete cascade not null ,
   price numeric(10,2) default 0 not null,
   stock_quantity int default 0 not null,
   is_active boolean default true not null
@@ -123,6 +162,25 @@ using ( true );
 CREATE POLICY "All users can view products"
 ON public.product 
 FOR SELECT 
-to authenticated
 using ( true );
-```
+
+
+-- Creates Views
+
+-- CREATE VIEW products_view_flat AS
+SELECT 
+  p.*,
+  bc.brand_id,
+  b.name as brand_name,
+  bc.category_id,
+  c.name as category_name
+
+FROM public.product as p
+INNER JOIN public.brand_category bc ON p.brand_category_id = bc.id
+INNER JOIN public.brand b ON bc.brand_id = b.id
+INNER JOIN public.category c ON bc.category_id = c.id;
+
+
+
+
+
