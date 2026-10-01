@@ -21,18 +21,41 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  void _showMessage(String message, {bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Theme.of(context).colorScheme.error : null,
+      ),
+    );
+  }
+
   Future<void> _handleRegistration() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Por favor, ingresa tanto el correo electrónico como la contraseña',
-          ),
-        ),
+      _showMessage(
+        'Por favor, ingresa tanto el correo electrónico como la contraseña',
       );
+      return;
+    }
+
+    if (!_isValidEmail(email)) {
+      _showMessage('Por favor, ingresa un correo electrónico válido',
+          isError: true);
+      return;
+    }
+
+    if (password.length < 6) {
+      _showMessage('La contraseña debe tener al menos 6 caracteres',
+          isError: true);
       return;
     }
 

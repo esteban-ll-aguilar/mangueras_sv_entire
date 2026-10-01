@@ -1,3 +1,4 @@
+
 ``` sql
 -- SQL script to create tables for products, brands, and categories
 -- with Row Level Security (RLS) policies in PostgreSQL

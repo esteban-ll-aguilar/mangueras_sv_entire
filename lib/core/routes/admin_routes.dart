@@ -6,7 +6,7 @@ import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/auth_wel
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/create_user_form.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/loginPage.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/forgotPasswordPage.dart';
-// import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/signUpPage.dart';
+import 'package:mangueras_sv_entire/app/modules/auth/presentation/pages/signUpPage.dart';
 import 'package:mangueras_sv_entire/app/modules/home/presentation/pages/homePage.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_brands_form_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/created_pages/create_categories_form_page.dart';
@@ -59,10 +59,9 @@ class AdminRouterNotifier extends ChangeNotifier {
 
     // Si el usuario está autenticado y está en páginas de auth, redirigir a home
     if (isAuth &&
-        (currentPath == '/' || currentPath == '/login'
-        // ||
-        // currentPath == '/signup'
-        )) {
+        (currentPath == '/' ||
+            currentPath == '/login' ||
+            currentPath == '/signup')) {
       return '/home';
     }
 
@@ -70,7 +69,7 @@ class AdminRouterNotifier extends ChangeNotifier {
     if (!isAuth &&
         currentPath != '/' &&
         currentPath != '/login' &&
-        // currentPath != '/signup' &&
+        currentPath != '/signup' &&
         currentPath != '/forgot-password' &&
         !currentPath.startsWith('/shop')
         ) {
@@ -92,11 +91,11 @@ class AdminRouterNotifier extends ChangeNotifier {
       name: AdminAppRouterNames.login.name,
       builder: (context, state) => const LoginPage(),
     ),
-    // GoRoute(
-    //   path: '/signup',
-    //   name: AdminAppRouterNames.signup.name,
-    //   builder: (context, state) => const SignupPage(),
-    // ),
+    GoRoute(
+      path: '/signup',
+      name: AdminAppRouterNames.signup.name,
+      builder: (context, state) => const SignupPage(),
+    ),
     GoRoute(
       path: '/forgot-password',
       name: AdminAppRouterNames.forgotPassword.name,

@@ -140,12 +140,13 @@ class _WelcomePageState extends ConsumerState<AuthWelcomePage> {
                     text: "Iniciar Sesión",
                     onTap: () => context.goNamed(AdminAppRouterNames.login.name),
                   ),
-                  // const SizedBox(height: 16),
-                  // _primaryButton(
-                  //   text: "Crear Cuenta",
-                  //   onTap: () => context.goNamed(AdminAppRouterNames.signup.name),
-                  //   isPrimary: false,
-                  // ),
+                  const SizedBox(height: 16),
+                  _primaryButton(
+                    text: "Crear Cuenta",
+                    onTap: () =>
+                        context.goNamed(AdminAppRouterNames.signup.name),
+                    isPrimary: false,
+                  ),
                 ],
               ),
 

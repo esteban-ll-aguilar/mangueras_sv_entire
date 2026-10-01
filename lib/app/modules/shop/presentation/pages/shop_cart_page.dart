@@ -470,7 +470,7 @@ class _CartSummary extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: onCheckout,
-                icon: const Icon(FontAwesomeIcons.whatsapp, size: 24),
+                icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 24),
                 label: const Text(
                   'Comprar por WhatsApp',
                   style: TextStyle(fontSize: 18),

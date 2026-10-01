@@ -48,7 +48,7 @@ dependencies:
   upgrader: ^12.1.0
   image_picker: ^1.2.0
   url_launcher: ^6.3.2
-  font_awesome_flutter: ^10.10.0
+  font_awesome_flutter: ^11.0.0
   #------- Local database
   drift: ^2.28.2
   drift_flutter: ^0.2.7

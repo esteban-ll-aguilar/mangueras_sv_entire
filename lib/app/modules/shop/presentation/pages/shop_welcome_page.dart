@@ -160,7 +160,7 @@ class _ShopWelcomePageState extends ConsumerState<ShopWelcomePage> {
         tooltip: 'Contáctanos por WhatsApp',
         backgroundColor: Color(0xFF1A237E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-        child: const Icon(FontAwesomeIcons.whatsapp, color: Colors.white),
+        child: const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.white),
       ),
     );
   }

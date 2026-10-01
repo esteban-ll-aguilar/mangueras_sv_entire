@@ -80,28 +80,57 @@ class Auth extends _$Auth {
 
       if (response.user != null) {
         state = AuthStateAuthenticated(response.user!);
-      } 
+      }
     } on AuthApiException catch (e) {
-      state = AuthStateError(e.message);
+      state = AuthStateError(_friendlyAuthError(e.message));
     } catch (e) {
-      state = AuthStateError(e.toString());
+      state = AuthStateError(_friendlyAuthError(e.toString()));
     }
+  }
+
+  String _friendlyAuthError(String message) {
+    final lower = message.toLowerCase();
+    if (lower.contains('user already registered') ||
+        lower.contains('already registered') ||
+        lower.contains('already exists')) {
+      return 'Este correo ya está registrado. Intenta iniciar sesión.';
+    }
+    if (lower.contains('invalid email') || lower.contains('invalid login')) {
+      return 'Correo electrónico o contraseña inválidos.';
+    }
+    if (lower.contains('password') && lower.contains('short')) {
+      return 'La contraseña debe tener al menos 6 caracteres.';
+    }
+    if (lower.contains('email not confirmed')) {
+      return 'Debes confirmar tu correo antes de iniciar sesión.';
+    }
+    return message;
   }
 
   Future<void> signUp(String email, String password) async {
     try {
       final response = await _supabase.auth.signUp(
         email: email,
-        password: password
+        password: password,
       );
 
-      if (response.user != null) {
+      // Si Supabase exige confirmación de email, session será null
+      // aunque user exista. En ese caso no autenticamos todavía.
+      if (response.session != null && response.user != null) {
         state = AuthStateAuthenticated(response.user!);
-      } 
+      } else if (response.user != null && response.session == null) {
+        state = const AuthStateError(
+          'Cuenta creada. Revisa tu correo para confirmar tu cuenta.',
+        );
+      } else {
+        state = const AuthStateError(
+          'No se pudo crear la cuenta. Intenta de nuevo.',
+        );
+      }
     } on AuthApiException catch (e) {
-      state = AuthStateError(e.message);
+      state = AuthStateError(_friendlyAuthError(e.message));
     } catch (e) {
-      state = AuthStateError(e.toString());
+      state = AuthStateError(_friendlyAuthError(e.toString()));
     }
   }
 

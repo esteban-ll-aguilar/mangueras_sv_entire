@@ -159,6 +159,7 @@ class AuthReusableWidgets {
     VoidCallback? onSuffixIconTap,
     bool obscureText = true,
   }) {
+    final bool effectiveObscure = isPassword ? obscureText : false;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -173,7 +174,7 @@ class AuthReusableWidgets {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          obscureText: isPassword && !obscureText,
+          obscureText: effectiveObscure,
           keyboardType: keyboardType,
           decoration: InputDecoration(
             filled: true,
@@ -194,7 +195,9 @@ class AuthReusableWidgets {
                 ? IconButton(
                     onPressed: onSuffixIconTap,
                     icon: Icon(
-                      obscureText ? Icons.visibility_off : Icons.visibility,
+                      effectiveObscure
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: Colors.grey.shade600,
                     ),
                   )
