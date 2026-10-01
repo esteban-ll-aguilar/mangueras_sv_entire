@@ -200,10 +200,35 @@ class ShopWelcomeComponentsWidgets {
                             context.go('/shop/products');
                           }
                         ),
-                        SizedBox(width: 24),
+                        SizedBox(width: 16),
+                        ShopWelcomePageWidgets.navButton(
+                          text: 'Iniciar sesión',
+                          onPressed: () {
+                            context.go('/login');
+                          }
+                        ),
+                        SizedBox(width: 8),
+                        OutlinedButton(
+                          onPressed: () {
+                            context.go('/signup');
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.white, width: 1.5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 14,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text('Registrarse'),
+                        ),
+                        SizedBox(width: 16),
                         ElevatedButton.icon(
                           onPressed: () {
-                            // context.go('/shop/products');
+                            context.go('/shop/cart');
                           },
                           icon: Icon(Icons.shopping_cart),
                           label: Text('Ver Carrito'),
@@ -220,9 +245,34 @@ class ShopWelcomeComponentsWidgets {
                           ),
                         ),
                       ] else
-                        IconButton(
-                          icon: Icon(Icons.shopping_cart, color: Colors.white),
-                          onPressed: () {},
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              tooltip: 'Iniciar sesión',
+                              icon: const Icon(Icons.person_outline,
+                                  color: Colors.white),
+                              onPressed: () {
+                                context.go('/login');
+                              },
+                            ),
+                            IconButton(
+                              tooltip: 'Registrarse',
+                              icon: const Icon(Icons.person_add_outlined,
+                                  color: Colors.white),
+                              onPressed: () {
+                                context.go('/signup');
+                              },
+                            ),
+                            IconButton(
+                              tooltip: 'Ver carrito',
+                              icon: const Icon(Icons.shopping_cart,
+                                  color: Colors.white),
+                              onPressed: () {
+                                context.go('/shop/cart');
+                              },
+                            ),
+                          ],
                         ),
                     ],
                   ),

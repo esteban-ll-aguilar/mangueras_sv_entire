@@ -10,7 +10,12 @@ sealed class AuthState {
 
 class AuthStateAuthenticated extends AuthState {
   final User user;
-  const AuthStateAuthenticated(this.user);
+  /// Rol cacheado desde public.profiles para guards síncronos del router.
+  /// null = aún cargando / sin perfil.
+  final String? role;
+  const AuthStateAuthenticated(this.user, {this.role});
+
+  bool get isAdmin => role == 'admin';
 }
 
 class AuthStateUnauthenticated extends AuthState {
@@ -32,11 +37,33 @@ class Auth extends _$Auth {
     return const AuthStateUnauthenticated();
   }
 
+  Future<String?> _fetchRole(String uid) async {
+    try {
+      final row = await _supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', uid)
+          .maybeSingle();
+      return (row?['role'] as String?) ?? 'cliente';
+    } catch (_) {
+      return 'cliente';
+    }
+  }
+
+  Future<void> refreshRole() async {
+    final s = state;
+    if (s is AuthStateAuthenticated) {
+      final role = await _fetchRole(s.user.id);
+      state = AuthStateAuthenticated(s.user, role: role);
+    }
+  }
+
   Future<void> _initialize() async {
     final session = _supabase.auth.currentSession;
 
     if (session != null) {
-      state = AuthStateAuthenticated(session.user);
+      final role = await _fetchRole(session.user.id);
+      state = AuthStateAuthenticated(session.user, role: role);
     }
 
     _supabase.auth.onAuthStateChange.listen((data) async {
@@ -46,13 +73,15 @@ class Auth extends _$Auth {
       switch (event) {
         case AuthChangeEvent.signedIn:
           if (session != null) {
-            state = AuthStateAuthenticated(session.user);
+            final role = await _fetchRole(session.user.id);
+            state = AuthStateAuthenticated(session.user, role: role);
           }
           break;
-        
+
         case AuthChangeEvent.userUpdated:
           if (session != null) {
-            state = AuthStateAuthenticated(session.user);
+            final role = await _fetchRole(session.user.id);
+            state = AuthStateAuthenticated(session.user, role: role);
           }
           break;
 
@@ -79,7 +108,8 @@ class Auth extends _$Auth {
       );
 
       if (response.user != null) {
-        state = AuthStateAuthenticated(response.user!);
+        final role = await _fetchRole(response.user!.id);
+        state = AuthStateAuthenticated(response.user!, role: role);
       }
     } on AuthApiException catch (e) {
       state = AuthStateError(_friendlyAuthError(e.message));
@@ -107,17 +137,35 @@ class Auth extends _$Auth {
     return message;
   }
 
-  Future<void> signUp(String email, String password) async {
+  /// Registro público: siempre rol cliente por defecto.
+  /// El trigger handle_new_user() crea el profile en public.profiles.
+  /// Se deja fallback por si el trigger tarda o email requiere confirmación.
+  Future<void> signUp(
+    String email,
+    String password, {
+    String fullName = '',
+    String role = 'cliente',
+  }) async {
     try {
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,
+        data: {'full_name': fullName, 'role': role},
       );
 
       // Si Supabase exige confirmación de email, session será null
       // aunque user exista. En ese caso no autenticamos todavía.
       if (response.session != null && response.user != null) {
-        state = AuthStateAuthenticated(response.user!);
+        // Fallback: asegura profile cliente si el trigger aún no corrió
+        try {
+          await _supabase.from('profiles').upsert({
+            'id': response.user!.id,
+            'email': email,
+            'full_name': fullName,
+            'role': role,
+          }, onConflict: 'id');
+        } catch (_) {}
+        state = AuthStateAuthenticated(response.user!, role: role);
       } else if (response.user != null && response.session == null) {
         state = const AuthStateError(
           'Cuenta creada. Revisa tu correo para confirmar tu cuenta.',
@@ -163,7 +211,8 @@ class Auth extends _$Auth {
         ),
       );
       if (response.user != null) {
-        state = AuthStateAuthenticated(response.user!);
+        final role = await _fetchRole(response.user!.id);
+        state = AuthStateAuthenticated(response.user!, role: role);
       }
     } on AuthApiException catch (e) {
       state = AuthStateError(e.message);
@@ -179,10 +228,11 @@ class Auth extends _$Auth {
         password: password,
         data: {
           'full_name': fullName,
+          'role': 'cliente',
         }
       );
       if (response.user != null) {
-        state = AuthStateAuthenticated(response.user!);
+        state = AuthStateAuthenticated(response.user!, role: 'cliente');
       }
     } on AuthApiException catch (e) {
       state = AuthStateError(e.message);

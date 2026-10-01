@@ -28,6 +28,11 @@ class _ModernNavBarState extends ConsumerState<ModernNavBar> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isWeb = size.width > 900;
+    final authState = ref.watch(authProvider);
+    final isAdmin =
+        authState is AuthStateAuthenticated && authState.isAdmin;
+    final roleLabel = isAdmin ? 'Administrador' : 'Cliente';
+    final subtitle = isAdmin ? 'Panel de Administración' : 'Mi Cuenta';
 
     return Container(
       decoration: BoxDecoration(
@@ -47,10 +52,10 @@ class _ModernNavBarState extends ConsumerState<ModernNavBar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Logo y nombre de la empresa
-              _buildLogoSection(isWeb),
+              _buildLogoSection(isWeb, subtitle),
 
               // Acciones de usuario
-              _buildUserActions(isWeb),
+              _buildUserActions(isWeb, roleLabel),
             ],
           ),
         ),
@@ -58,7 +63,7 @@ class _ModernNavBarState extends ConsumerState<ModernNavBar> {
     );
   }
 
-  Widget _buildLogoSection(bool isWeb) {
+  Widget _buildLogoSection(bool isWeb, String subtitle) {
     return Row(
       children: [
         // Logo
@@ -108,7 +113,7 @@ class _ModernNavBarState extends ConsumerState<ModernNavBar> {
               ),
               const SizedBox(height: 2),
               Text(
-                'Panel de Administración',
+                subtitle,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   color: Colors.grey.shade600,
@@ -122,7 +127,7 @@ class _ModernNavBarState extends ConsumerState<ModernNavBar> {
     );
   }
 
-  Widget _buildUserActions(bool isWeb) {
+  Widget _buildUserActions(bool isWeb, String roleLabel) {
     return Row(
       children: [
         // Información del usuario (solo web)
@@ -143,7 +148,7 @@ class _ModernNavBarState extends ConsumerState<ModernNavBar> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Administrador',
+                  roleLabel,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

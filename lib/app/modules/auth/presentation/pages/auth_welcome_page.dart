@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/infrastructure/providers/authProvider.dart';
-import 'package:mangueras_sv_entire/core/routes/admin_routes.dart';
+import 'package:mangueras_sv_entire/core/routes/app_router.dart';
 
 class AuthWelcomePage extends ConsumerStatefulWidget {
   const AuthWelcomePage({Key? key, this.title}) : super(key: key);
@@ -101,7 +101,7 @@ class _WelcomePageState extends ConsumerState<AuthWelcomePage> {
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next is AuthStateAuthenticated) {
         // Redirigir al HomePage si el usuario ya está autenticado
-        context.goNamed(AdminAppRouterNames.home.name);
+        context.goNamed(AppRouteNames.home.name);
       }
     });
 
@@ -138,13 +138,13 @@ class _WelcomePageState extends ConsumerState<AuthWelcomePage> {
                 children: [
                   _primaryButton(
                     text: "Iniciar Sesión",
-                    onTap: () => context.goNamed(AdminAppRouterNames.login.name),
+                    onTap: () => context.goNamed(AppRouteNames.login.name),
                   ),
                   const SizedBox(height: 16),
                   _primaryButton(
                     text: "Crear Cuenta",
                     onTap: () =>
-                        context.goNamed(AdminAppRouterNames.signup.name),
+                        context.goNamed(AppRouteNames.signup.name),
                     isPrimary: false,
                   ),
                 ],

@@ -14,6 +14,8 @@ import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/cre
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_brands_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_categories_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/view_pages/view_products_page.dart';
+import 'package:mangueras_sv_entire/app/modules/orders/presentation/pages/admin_orders_page.dart';
+import 'package:mangueras_sv_entire/app/modules/orders/presentation/pages/my_orders_page.dart';
 
 enum AdminAppRouterNames {
   login,
@@ -28,7 +30,9 @@ enum AdminAppRouterNames {
   categories,
   shopCategories,
   brands,
-  createUsers
+  createUsers,
+  myOrders,
+  adminOrders,
 }
 
 final adminRouterProvider = Provider<GoRouter>((ref) {
@@ -140,6 +144,16 @@ class AdminRouterNotifier extends ChangeNotifier {
       path: '/products',
       name: AdminAppRouterNames.products.name,
       builder: (context, state) => const ProductsPage(),
+    ),
+    GoRoute(
+      path: '/my-orders',
+      name: AdminAppRouterNames.myOrders.name,
+      builder: (context, state) => const MyOrdersPage(),
+    ),
+    GoRoute(
+      path: '/admin-orders',
+      name: AdminAppRouterNames.adminOrders.name,
+      builder: (context, state) => const AdminOrdersPage(),
     ),
   ];
 }

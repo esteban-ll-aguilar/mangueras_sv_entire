@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/infrastructure/providers/authProvider.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/widgets/auth_reusable_widgets.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/widgets/bezierContainer.dart';
-import 'package:mangueras_sv_entire/core/routes/admin_routes.dart';
+import 'package:mangueras_sv_entire/core/routes/app_router.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({Key? key, this.title}) : super(key: key);
@@ -59,7 +59,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next is AuthStateAuthenticated) {
-        context.goNamed(AdminAppRouterNames.home.name);
+        context.goNamed(AppRouteNames.home.name);
       } else if (next is AuthStateError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -212,7 +212,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   alignment: Alignment.topLeft,
                   child: AuthReusableWidgets.backButton(
                     context,
-                    routeName: AdminAppRouterNames.welcome.name,
+                    routeName: AppRouteNames.authWelcome.name,
                   ),
                 ),
               ),
@@ -294,7 +294,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           alignment: Alignment.centerRight,
           child: GestureDetector(
             onTap: () {
-              context.goNamed(AdminAppRouterNames.forgotPassword.name);
+              context.goNamed(AppRouteNames.forgotPassword.name);
             },
             child: Text(
               "¿Olvidaste tu contraseña?",

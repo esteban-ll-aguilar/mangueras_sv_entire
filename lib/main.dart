@@ -2,14 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
-import 'package:mangueras_sv_entire/core/routes/common_router.dart';
+import 'package:mangueras_sv_entire/core/routes/app_router.dart';
 import 'package:mangueras_sv_entire/core/theme/theme.dart';
 import 'package:mangueras_sv_entire/core/upgrade/upgrade_config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:upgrader/upgrader.dart';
-import 'package:mangueras_sv_entire/core/routes/admin_routes.dart';
-import 'package:mangueras_sv_entire/core/routes/common_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,20 +24,17 @@ void main() async {
     ),
   );
 
-  final isAdmin = dotenv.env['FLAVOR'] == 'admin';
-  logging.i('App flavor: ${isAdmin ? 'Admin' : 'Common'}');
-  final routes = isAdmin ? adminRouterProvider : commonRouterProvider;
-  runApp(ProviderScope(child: MyApp(routes: routes)));
+  // Router único por rol (sin FLAVOR). FLAVOR queda como legacy ignorado.
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
-  final Provider routes;
-  const MyApp({super.key, required this.routes});
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appRouter = ref.watch(routes);
+    final appRouter = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,

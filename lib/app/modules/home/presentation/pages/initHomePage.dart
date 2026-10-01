@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mangueras_sv_entire/app/modules/auth/infrastructure/providers/authProvider.dart';
 
-class InitHomePage extends StatefulWidget {
+class InitHomePage extends ConsumerWidget {
   const InitHomePage({super.key});
 
   @override
-  State<InitHomePage> createState() => _InitHomePageState();
-}
-
-class _InitHomePageState extends State<InitHomePage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final isAdmin =
+        authState is AuthStateAuthenticated && authState.isAdmin;
     final size = MediaQuery.of(context).size;
     final isWeb = size.width > 900;
     final isTablet = size.width > 600 && size.width <= 900;
@@ -40,63 +40,97 @@ class _InitHomePageState extends State<InitHomePage> {
                 color: Colors.grey.shade600,
               ),
             ),
-            SizedBox(height: isWeb ? 40 : 32),
+            if (isAdmin) ...[
+              SizedBox(height: isWeb ? 40 : 32),
 
-            // Sección de Creación
-            _buildSectionTitle('Creación de Nuevos Datos'),
-            const SizedBox(height: 16),
-            _buildGridSection(
-              isWeb: isWeb,
-              isTablet: isTablet,
-              cards: [
-                _CardData(
-                  icon: Icons.category_outlined,
-                  title: 'Añadir Categorías',
-                  subtitle: 'Crear nuevas categorías de productos',
-                  route: '/create-categories',
-                ),
-                _CardData(
-                  icon: Icons.label_outline,
-                  title: 'Añadir Marcas',
-                  subtitle: 'Registrar nuevas marcas de productos',
-                  route: '/create-brands',
-                ),
-                _CardData(
-                  icon: Icons.inventory_2_outlined,
-                  title: 'Añadir Productos',
-                  subtitle: 'Agregar nuevos productos al inventario',
-                  route: '/create-products',
-                ),
-              ],
-            ),
+              // Sección de Creación (solo admin)
+              _buildSectionTitle('Creación de Nuevos Datos'),
+              const SizedBox(height: 16),
+              _buildGridSection(
+                isWeb: isWeb,
+                isTablet: isTablet,
+                cards: [
+                  _CardData(
+                    icon: Icons.category_outlined,
+                    title: 'Añadir Categorías',
+                    subtitle: 'Crear nuevas categorías de productos',
+                    route: '/create-categories',
+                  ),
+                  _CardData(
+                    icon: Icons.label_outline,
+                    title: 'Añadir Marcas',
+                    subtitle: 'Registrar nuevas marcas de productos',
+                    route: '/create-brands',
+                  ),
+                  _CardData(
+                    icon: Icons.inventory_2_outlined,
+                    title: 'Añadir Productos',
+                    subtitle: 'Agregar nuevos productos al inventario',
+                    route: '/create-products',
+                  ),
+                ],
+              ),
+
+              SizedBox(height: isWeb ? 48 : 32),
+
+              // Sección de Gestión (solo admin)
+              _buildSectionTitle('Gestión de Datos'),
+              const SizedBox(height: 16),
+              _buildGridSection(
+                isWeb: isWeb,
+                isTablet: isTablet,
+                cards: [
+                  _CardData(
+                    icon: Icons.grid_view_outlined,
+                    title: 'Gestionar Categorías',
+                    subtitle: 'Ver, editar o eliminar categorías',
+                    route: '/categories',
+                  ),
+                  _CardData(
+                    icon: Icons.bookmark_border,
+                    title: 'Gestionar Marcas',
+                    subtitle: 'Administrar marcas registradas',
+                    route: '/brands',
+                  ),
+                  _CardData(
+                    icon: Icons.inventory_outlined,
+                    title: 'Gestionar Productos',
+                    subtitle: 'Administrar inventario completo',
+                    route: '/products',
+                  ),
+                ],
+              ),
+            ],
 
             SizedBox(height: isWeb ? 48 : 32),
 
-            // Sección de Gestión
-            _buildSectionTitle('Gestión de Datos'),
+            // Sección de Pedidos (todos ven Mis Pedidos, solo admin ve pendientes)
+            _buildSectionTitle('Pedidos'),
             const SizedBox(height: 16),
             _buildGridSection(
               isWeb: isWeb,
               isTablet: isTablet,
               cards: [
                 _CardData(
-                  icon: Icons.grid_view_outlined,
-                  title: 'Gestionar Categorías',
-                  subtitle: 'Ver, editar o eliminar categorías',
-                  route: '/categories',
+                  icon: Icons.receipt_long_outlined,
+                  title: 'Mis Pedidos',
+                  subtitle: 'Carrito guardado y compras',
+                  route: '/my-orders',
                 ),
-                _CardData(
-                  icon: Icons.bookmark_border,
-                  title: 'Gestionar Marcas',
-                  subtitle: 'Administrar marcas registradas',
-                  route: '/brands',
-                ),
-                _CardData(
-                  icon: Icons.inventory_outlined,
-                  title: 'Gestionar Productos',
-                  subtitle: 'Administrar inventario completo',
-                  route: '/products',
-                ),
+                if (isAdmin)
+                  _CardData(
+                    icon: Icons.sell_outlined,
+                    title: 'Pedidos pendientes',
+                    subtitle: 'Marcar vendido y descontar stock',
+                    route: '/admin-orders',
+                  ),
+                if (!isAdmin)
+                  _CardData(
+                    icon: Icons.store_outlined,
+                    title: 'Ver Tienda',
+                    subtitle: 'Explorar productos',
+                    route: '/shop/products',
+                  ),
               ],
             ),
           ],

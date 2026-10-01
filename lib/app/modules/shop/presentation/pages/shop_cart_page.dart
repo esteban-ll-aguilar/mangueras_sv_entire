@@ -4,6 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/cart_providers.dart';
+import 'package:mangueras_sv_entire/app/modules/orders/domain/models/order_item_model.dart';
+import 'package:mangueras_sv_entire/app/modules/orders/infrastructure/providers/order_providers.dart';
 import 'package:mangueras_sv_entire/core/core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -122,12 +124,40 @@ class ShopCartPage extends ConsumerWidget {
     );
   }
 
-  /// Maneja el proceso de checkout (envío por WhatsApp)
+  /// Maneja el proceso de checkout: 1) guarda pedido en Supabase 2) envía por WhatsApp
   Future<void> _handleCheckout(
     BuildContext context,
     WidgetRef ref,
     List<dynamic> items,
   ) async {
+    // 1) Guardar carrito/pedido en la nube (si hay sesión; si no, solo WhatsApp)
+    try {
+      final orderItems = items
+          .map((item) => OrderItemModel(
+                productCode: item.productCode as String,
+                quantity: item.quantity as int,
+                unitPrice: (item.productPrice as num).toDouble(),
+              ))
+          .toList();
+      final order = await ref
+          .read(orderRepositoryProvider)
+          .createOrderFromCart(orderItems);
+      if (context.mounted && order != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Pedido ${order.id.substring(0, 8)} guardado')),
+        );
+        ref.invalidate(myOrdersProvider);
+        ref.invalidate(pendingOrdersProvider);
+      }
+    } catch (e) {
+      // Sin sesión o error: se sigue con WhatsApp, pero se avisa
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Pedido solo por WhatsApp ($e)')),
+        );
+      }
+    }
+
     // Construir mensaje para WhatsApp
     final buffer = StringBuffer();
     buffer.writeln('*PEDIDO - Mangueras SV*\n');

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mangueras_sv_entire/app/modules/shop/infrastructure/providers/shop_providers.dart';
-import 'package:mangueras_sv_entire/core/routes/common_router.dart';
+import 'package:mangueras_sv_entire/core/routes/app_router.dart';
 import 'package:mangueras_sv_entire/core/utils/constants/constants.dart';
 
 /// Widget del sidebar con filtros de marcas y categorías
@@ -78,13 +78,13 @@ class ShopFiltersSidebar extends ConsumerWidget {
                         icon: Icons.home_rounded,
                         label: 'Inicio',
                         color: const Color(0xFF1A237E),
-                        onTap: () => context.goNamed(CommonRouterNames.welcome.name),
+                        onTap: () => context.goNamed(AppRouteNames.shopWelcome.name),
                       ),
                       _QuickActionButton(
                         icon: Icons.shopping_cart_rounded,
                         label: 'Carrito',
                         color: Colors.orange,
-                        onTap: () => context.goNamed(CommonRouterNames.shopCart.name),
+                        onTap: () => context.goNamed(AppRouteNames.shopCart.name),
                       ),
                       _QuickActionButton(
                         icon: Icons.phone_rounded,

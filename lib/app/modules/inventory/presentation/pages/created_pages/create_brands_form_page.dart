@@ -8,7 +8,7 @@ import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/brand_mo
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/providers/inventory_providers.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/repository/inventory_storage_repository_impl.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/inventory_reusable_widgets.dart';
-import 'package:mangueras_sv_entire/core/routes/admin_routes.dart';
+import 'package:mangueras_sv_entire/core/routes/app_router.dart';
 
 class CreateBrandsFormPage extends ConsumerStatefulWidget {
   const CreateBrandsFormPage({Key? key}) : super(key: key);
@@ -106,7 +106,7 @@ class _CreateBrandsFormPageState extends ConsumerState<CreateBrandsFormPage> {
       appBar: AppBar(
         leading: AuthReusableWidgets.backButton(
           context,
-          routeName: AdminAppRouterNames.home.name,
+          routeName: AppRouteNames.home.name,
         ),
         title: const Text('Añadir Marcas'),
       ),

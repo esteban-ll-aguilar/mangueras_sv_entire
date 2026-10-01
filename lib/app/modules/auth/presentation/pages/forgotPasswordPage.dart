@@ -4,8 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/infrastructure/providers/authProvider.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/widgets/auth_reusable_widgets.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/widgets/bezierContainer.dart';
-import 'package:mangueras_sv_entire/core/routes/admin_routes.dart';
-import 'package:mangueras_sv_entire/core/routes/common_router.dart';
+import 'package:mangueras_sv_entire/core/routes/app_router.dart';
 
 class ForgotPasswordPage extends ConsumerStatefulWidget {
   const ForgotPasswordPage({Key? key, this.title}) : super(key: key);
@@ -64,7 +63,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next is AuthStateAuthenticated) {
         // Redirigir al HomePage
-        context.goNamed(AdminAppRouterNames.home.name);
+        context.goNamed(AppRouteNames.home.name);
       } else if (next is AuthStateError) {
         // Mostrar mensaje de error
         ScaffoldMessenger.of(context).showSnackBar(
@@ -100,7 +99,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                       alignment: Alignment.topLeft,
                       child: AuthReusableWidgets.backButton(
                         context,
-                        routeName: AdminAppRouterNames.welcome.name,
+                        routeName: AppRouteNames.authWelcome.name,
                       ),
                     ),
                   ),

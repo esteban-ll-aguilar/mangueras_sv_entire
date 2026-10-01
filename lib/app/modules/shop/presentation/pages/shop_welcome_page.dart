@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/models/brand_model.dart';
 import 'dart:async';
@@ -224,8 +225,21 @@ class _ShopWelcomePageState extends ConsumerState<ShopWelcomePage> {
                       ),
                     ),
                     SizedBox(width: 8),
+                    IconButton(
+                      tooltip: 'Iniciar sesión',
+                      icon: const Icon(Icons.person_outline,
+                          color: Color(0xFF1A237E)),
+                      onPressed: () => context.go('/login'),
+                    ),
+                    IconButton(
+                      tooltip: 'Registrarse',
+                      icon: const Icon(Icons.person_add_outlined,
+                          color: Color(0xFF1A237E)),
+                      onPressed: () => context.go('/signup'),
+                    ),
+                    SizedBox(width: 4),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => context.go('/shop/cart'),
                       child: Icon(Icons.shopping_cart, color: Colors.white),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF1A237E),

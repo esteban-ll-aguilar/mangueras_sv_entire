@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/infrastructure/providers/authProvider.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/widgets/bezierContainer.dart';
 import 'package:mangueras_sv_entire/app/modules/auth/presentation/widgets/auth_reusable_widgets.dart';
-import 'package:mangueras_sv_entire/core/routes/admin_routes.dart';
+import 'package:mangueras_sv_entire/core/routes/app_router.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({Key? key, this.title}) : super(key: key);
@@ -82,7 +82,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next is AuthStateAuthenticated) {
-        context.goNamed(AdminAppRouterNames.home.name);
+        context.goNamed(AppRouteNames.home.name);
       } else if (next is AuthStateError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -235,7 +235,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   alignment: Alignment.topLeft,
                   child: AuthReusableWidgets.backButton(
                     context,
-                    routeName: AdminAppRouterNames.welcome.name,
+                    routeName: AppRouteNames.authWelcome.name,
                   ),
                 ),
               ),
@@ -323,7 +323,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
           child: AuthReusableWidgets.footer(
             callToAction: "¿Ya tienes una cuenta?",
             actionText: "Iniciar Sesión",
-            onTap: () => context.goNamed(AdminAppRouterNames.login.name),
+            onTap: () => context.goNamed(AppRouteNames.login.name),
           ),
         ),
       ],
