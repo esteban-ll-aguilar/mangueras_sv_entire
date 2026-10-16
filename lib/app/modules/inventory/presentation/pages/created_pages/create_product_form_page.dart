@@ -20,6 +20,24 @@ class CreateProductsFormPage extends ConsumerStatefulWidget {
       _CreateProductsFormPageState();
 }
 
+/// Fase 3: traduce errores técnicos a mensaje genérico de cara al usuario.
+String _friendlySaveError(Object e) {
+  final text = e.toString();
+  if (text.contains('UNSUPPORTED_TYPE')) {
+    return 'Tipo de imagen no permitido. Usa JPG, PNG o WEBP.';
+  }
+  if (text.contains('FILE_TOO_LARGE')) {
+    return 'La imagen supera los 5 MB permitidos.';
+  }
+  if (text.contains('UPLOAD_FAILED') ||
+      text.contains('StorageException') ||
+      text.contains('LOAD_FAILED') ||
+      text.contains('DELETE_FAILED')) {
+    return 'No se pudo subir la imagen. Intenta de nuevo.';
+  }
+  return 'No se pudo guardar. Revisa los datos e intenta de nuevo.';
+}
+
 class _CreateProductsFormPageState
     extends ConsumerState<CreateProductsFormPage> {
   final _formKey = GlobalKey<FormState>();
@@ -109,13 +127,14 @@ class _CreateProductsFormPageState
           );
         }
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         setState(() => _isLoadingAssociationId = false);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al obtener asociación: $e'),
+          const SnackBar(
+            // Fase 3: genérico, sin $e (tabla/consulta).
+            content: Text('No se pudo obtener la asociación. Intenta de nuevo.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -228,9 +247,10 @@ class _CreateProductsFormPageState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error al guardar: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          // Fase 3: mapea StorageException a mensaje útil, resto genérico.
+          SnackBar(content: Text(_friendlySaveError(e))),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

@@ -92,7 +92,9 @@ class ShopCartPage extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text('Error: $error')),
+        // Fase 3: genérico, sin exponer $error (PostgREST/tabla).
+        error: (_, __) =>
+            const Center(child: Text('No se pudo cargar el carrito.')),
       ),
     );
   }
@@ -149,11 +151,13 @@ class ShopCartPage extends ConsumerWidget {
         ref.invalidate(myOrdersProvider);
         ref.invalidate(pendingOrdersProvider);
       }
-    } catch (e) {
-      // Sin sesión o error: se sigue con WhatsApp, pero se avisa
+    } catch (_) {
+      // Sin sesión o error: se sigue con WhatsApp, mensaje genérico (Fase 3).
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Pedido solo por WhatsApp ($e)')),
+          const SnackBar(
+            content: Text('Pedido solo por WhatsApp (no se guardó en la nube)'),
+          ),
         );
       }
     }
@@ -229,11 +233,11 @@ class ShopCartPage extends ConsumerWidget {
           );
         }
       }
-    } catch (e) {
+    } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo abrir WhatsApp')),
+        );
       }
     }
   }

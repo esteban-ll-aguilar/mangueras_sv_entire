@@ -70,13 +70,19 @@ class ProductRepositoryImpl extends ProductRepository {
     }
   }
 
+  /// Fase 3: escapa comodines de LIKE para no exponer/alterar la consulta.
+  String _escapeLike(String input) =>
+      input.replaceAll('\\', '\\\\').replaceAll('%', '\\%').replaceAll('_', '\\_');
+
   @override
   Future<List<ProductModel>> getProductsByName(String name) async {
     try {
+      final safe = _escapeLike(name.trim());
+      if (safe.isEmpty) return [];
       final response = await _supabase
           .from('products_view_flat')
           .select()
-          .like('name', '%$name%');
+          .like('name', '%$safe%');
       return (response as List)
           .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -135,8 +141,9 @@ class ProductRepositoryImpl extends ProductRepository {
       var query = _supabase
           .from('products_view_flat')
           .select();
-          if (productName != null && productName.isNotEmpty) {
-            query = query.or('name.ilike.%$productName%,code.ilike.%$productName%');
+          if (productName != null && productName.trim().isNotEmpty) {
+            final safe = _escapeLike(productName.trim());
+            query = query.or('name.ilike.%$safe%,code.ilike.%$safe%');
           }
           if (brandIds != null && brandIds.isNotEmpty) {
             query = query.inFilter('brand_id', brandIds.toList());

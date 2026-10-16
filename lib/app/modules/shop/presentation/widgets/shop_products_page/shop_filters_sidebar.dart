@@ -313,7 +313,8 @@ class _BrandFilters extends ConsumerWidget {
         );
       },
       loading: () => const _LoadingCard(title: 'Marcas'),
-      error: (error, stack) => _ErrorCard(title: 'Marcas', error: error.toString()),
+      // Fase 3: genérico, sin error.toString().
+      error: (_, __) => const _ErrorCard(title: 'Marcas'),
     );
   }
 
@@ -435,7 +436,8 @@ class _CategoryFilters extends ConsumerWidget {
         );
       },
       loading: () => const _LoadingCard(title: 'Categorías'),
-      error: (error, stack) => _ErrorCard(title: 'Categorías', error: error.toString()),
+      // Fase 3: genérico, sin error.toString().
+      error: (_, __) => const _ErrorCard(title: 'Categorías'),
     );
   }
 }
@@ -684,12 +686,11 @@ class _LoadingCard extends StatelessWidget {
   }
 }
 
-/// Widget de error para filtros
+/// Widget de error para filtros (Fase 3: genérico, sin detalle técnico).
 class _ErrorCard extends StatelessWidget {
   final String title;
-  final String error;
 
-  const _ErrorCard({required this.title, required this.error});
+  const _ErrorCard({required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -724,7 +725,7 @@ class _ErrorCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            error,
+            'Intenta de nuevo más tarde.',
             style: TextStyle(
               color: Colors.red[600],
               fontSize: 12,

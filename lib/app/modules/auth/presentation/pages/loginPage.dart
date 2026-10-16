@@ -21,6 +21,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
   Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -32,6 +37,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             "Por favor, ingresa tanto el correo electrónico como la contraseña",
           ),
         ),
+      );
+      return;
+    }
+
+    // Fase 3 (E4): validación unificada ES en cliente, sin mandar basura al servidor.
+    if (!_isValidEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Revisa los datos ingresados.')),
       );
       return;
     }

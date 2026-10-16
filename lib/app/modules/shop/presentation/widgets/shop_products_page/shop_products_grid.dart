@@ -84,7 +84,8 @@ class ShopProductsGrid extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => _ErrorState(error: error.toString()),
+            // Fase 3: mensaje genérico, sin exponer error.toString() (tabla/vista/query).
+            error: (_, __) => const _ErrorState(),
           ),
         ),
       ],
@@ -180,11 +181,9 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-/// Estado de error
+/// Estado de error (Fase 3: genérico, sin detalle técnico en UI).
 class _ErrorState extends StatelessWidget {
-  final String error;
-
-  const _ErrorState({required this.error});
+  const _ErrorState();
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +198,7 @@ class _ErrorState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Error al cargar productos',
+            'No se pudieron cargar los productos',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -208,7 +207,7 @@ class _ErrorState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            error,
+            'Intenta de nuevo más tarde.',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],

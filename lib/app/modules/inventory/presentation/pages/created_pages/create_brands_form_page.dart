@@ -105,8 +105,13 @@ class _CreateBrandsFormPageState extends ConsumerState<CreateBrandsFormPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            // Fase 3: genérico, sin $e.
             content: Text(
-              'Error al guardar: $e',
+              e.toString().contains('UNSUPPORTED_TYPE')
+                  ? 'Tipo de imagen no permitido. Usa JPG, PNG o WEBP.'
+                  : e.toString().contains('FILE_TOO_LARGE')
+                      ? 'La imagen supera los 5 MB permitidos.'
+                      : 'No se pudo guardar. Revisa los datos e intenta de nuevo.',
               style: GoogleFonts.inter(fontWeight: FontWeight.w500),
             ),
             backgroundColor: Colors.red.shade600,

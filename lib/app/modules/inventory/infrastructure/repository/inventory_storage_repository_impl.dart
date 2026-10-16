@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:mangueras_sv_entire/app/modules/inventory/domain/repository/inventory_storage_repository.dart';
+import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class InventoryStorageRepositoryImpl implements InventoryStorageRepository {
@@ -8,13 +9,22 @@ class InventoryStorageRepositoryImpl implements InventoryStorageRepository {
 
   InventoryStorageRepositoryImpl(this._bucketName,this._supabase);
 
+  static const _maxImageBytes = 5 * 1024 * 1024;
+  static const _allowedExtensions = {'jpg', 'jpeg', 'png', 'webp'};
+
   @override
   Future<String> uploadImage(StorageFolder subFolder,String id, Uint8List imageBytes, String fileName) async {
     try {
-      // Generar nombre único para el archivo
-      final fileExtension = fileName.split('.').last;
+      // Fase 3: validación real de tipo/peso antes de subir.
+      final fileExtension = fileName.split('.').last.toLowerCase();
+      if (!_allowedExtensions.contains(fileExtension)) {
+        throw StorageException('UNSUPPORTED_TYPE');
+      }
+      if (imageBytes.lengthInBytes > _maxImageBytes) {
+        throw StorageException('FILE_TOO_LARGE');
+      }
       final uniqueFileName = '${subFolder.name}/${id}.$fileExtension';
-      
+
       // Subir archivo a Supabase Storage
       await _supabase.storage
           .from(_bucketName)
@@ -26,10 +36,14 @@ class InventoryStorageRepositoryImpl implements InventoryStorageRepository {
               upsert: true,
             ),
           );
-      
+
       return uniqueFileName;
+    } on StorageException {
+      rethrow;
     } catch (e) {
-      throw StorageException('Failed to upload profile image: $e');
+      // Fase 3: detalle solo en log, código genérico a UI.
+      logging.e('uploadImage failed: $e');
+      throw StorageException('UPLOAD_FAILED');
     }
   }
 
@@ -42,7 +56,8 @@ class InventoryStorageRepositoryImpl implements InventoryStorageRepository {
       
       return url;
     } catch (e) {
-      throw StorageException('Failed to get profile image URL: $e');
+      logging.e('getImageUrl failed: $e');
+      throw StorageException('LOAD_FAILED');
     }
   }
 
@@ -52,10 +67,11 @@ class InventoryStorageRepositoryImpl implements InventoryStorageRepository {
       await _supabase.storage
           .from(_bucketName)
           .remove([fileName]);
-      
+
       return true;
     } catch (e) {
-      throw StorageException('Failed to delete profile image: $e');
+      logging.e('deleteImage failed: $e');
+      throw StorageException('DELETE_FAILED');
     }
   }
 

@@ -118,23 +118,28 @@ class Auth extends _$Auth {
     }
   }
 
+  /// Fase 3: mensaje genérico al usuario, sin exponer texto crudo del servidor.
+  /// No se retorna [message] tal cual para evitar fuga (proveedor, idioma,
+  /// enumeración de cuentas). El detalle queda en el log vía `logging`.
   String _friendlyAuthError(String message) {
     final lower = message.toLowerCase();
     if (lower.contains('user already registered') ||
         lower.contains('already registered') ||
         lower.contains('already exists')) {
-      return 'Este correo ya está registrado. Intenta iniciar sesión.';
+      return 'No se pudo completar el registro. Si ya tienes cuenta, inicia sesión.';
     }
-    if (lower.contains('invalid email') || lower.contains('invalid login')) {
-      return 'Correo electrónico o contraseña inválidos.';
+    if (lower.contains('invalid login') ||
+        lower.contains('invalid email') ||
+        lower.contains('invalid credentials') ||
+        lower.contains('email not confirmed')) {
+      // Mensaje único anti-enumeración: no confirma si el correo existe.
+      return 'Credenciales inválidas. Verifica tu correo y contraseña.';
     }
-    if (lower.contains('password') && lower.contains('short')) {
+    if (lower.contains('password') &&
+        (lower.contains('short') || lower.contains('weak'))) {
       return 'La contraseña debe tener al menos 6 caracteres.';
     }
-    if (lower.contains('email not confirmed')) {
-      return 'Debes confirmar tu correo antes de iniciar sesión.';
-    }
-    return message;
+    return 'Ocurrió un error de autenticación. Intenta de nuevo.';
   }
 
   /// Registro público: siempre rol cliente por defecto.
@@ -187,9 +192,11 @@ class Auth extends _$Auth {
       await _supabase.auth.signOut();
       state = const AuthStateUnauthenticated();
     } on AuthApiException catch (e) {
-      state = AuthStateError(e.message);
+      state = AuthStateError(_friendlyAuthError(e.message));
     } catch (e) {
-      state = AuthStateError(e.toString());
+      state = const AuthStateError(
+        'No se pudo cerrar la sesión. Intenta de nuevo.',
+      );
     }
   }
 
@@ -197,9 +204,11 @@ class Auth extends _$Auth {
     try {
       await _supabase.auth.resetPasswordForEmail(email);
     } on AuthApiException catch (e) {
-      state = AuthStateError(e.message);
-    } catch (e) {
-      state = AuthStateError(e.toString());
+      state = AuthStateError(_friendlyAuthError(e.message));
+    } catch (_) {
+      state = const AuthStateError(
+        'No se pudo enviar el correo. Intenta de nuevo.',
+      );
     }
   }
 
@@ -215,9 +224,11 @@ class Auth extends _$Auth {
         state = AuthStateAuthenticated(response.user!, role: role);
       }
     } on AuthApiException catch (e) {
-      state = AuthStateError(e.message);
-    } catch (e) {
-      state = AuthStateError(e.toString());
+      state = AuthStateError(_friendlyAuthError(e.message));
+    } catch (_) {
+      state = const AuthStateError(
+        'No se pudo actualizar el perfil. Intenta de nuevo.',
+      );
     }
   }
 
@@ -235,9 +246,11 @@ class Auth extends _$Auth {
         state = AuthStateAuthenticated(response.user!, role: 'cliente');
       }
     } on AuthApiException catch (e) {
-      state = AuthStateError(e.message);
-    } catch (e) {
-      state = AuthStateError(e.toString());
+      state = AuthStateError(_friendlyAuthError(e.message));
+    } catch (_) {
+      state = const AuthStateError(
+        'No se pudo crear el usuario. Intenta de nuevo.',
+      );
     }
   }
 

@@ -25,6 +25,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   }
   bool _isLoading = false; // Variable para controlar el estado de carga
 
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
   Future<void> _handleForgotPassword() async {
     final email = _emailController.text.trim();
 
@@ -32,6 +37,14 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
       // Mostrar mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Por favor, ingresa tu correo electrónico")),
+      );
+      return;
+    }
+
+    // Fase 3 (E4): no revelar si la cuenta existe; mensaje neutro siempre.
+    if (!_isValidEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Revisa los datos ingresados.')),
       );
       return;
     }
