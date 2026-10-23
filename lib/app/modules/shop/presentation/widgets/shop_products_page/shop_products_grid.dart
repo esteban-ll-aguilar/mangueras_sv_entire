@@ -40,15 +40,14 @@ class ShopProductsGrid extends ConsumerWidget {
                 return _EmptyState();
               }
 
-
               return GridView.builder(
                 padding: const EdgeInsets.all(16),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: isDesktop
                       ? 4
                       : isTablet
-                          ? 3
-                          : 1,
+                      ? 3
+                      : 1,
                 ),
                 itemCount: products.length,
                 itemBuilder: (context, index) {
@@ -57,17 +56,21 @@ class ShopProductsGrid extends ConsumerWidget {
                     product: product,
                     onAddToCart: (quantity) async {
                       // Agregar al carrito local
-                      await ref.read(cartActionsProvider.notifier).addToCart(
+                      await ref
+                          .read(cartActionsProvider.notifier)
+                          .addToCart(
                             product: product,
                             quantity: quantity,
                             brandName: product.brandName,
-                            categoryName: product.categoryName
+                            categoryName: product.categoryName,
                           );
-                        
+
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('$quantity x ${product.name} agregado al carrito'),
+                            content: Text(
+                              '$quantity x ${product.name} agregado al carrito',
+                            ),
                             duration: const Duration(seconds: 2),
                             action: SnackBarAction(
                               label: 'Ver carrito',
@@ -84,8 +87,14 @@ class ShopProductsGrid extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
+<<<<<<< HEAD
             // Fase 3: mensaje genérico, sin exponer error.toString() (tabla/vista/query).
             error: (_, __) => const _ErrorState(),
+=======
+            error: (error, stack) => const _ErrorState(
+              error: 'No se pudieron cargar los productos.',
+            ),
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
           ),
         ),
       ],
@@ -113,9 +122,7 @@ class _ProductsToolbar extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Colors.grey[300]!),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -123,8 +130,9 @@ class _ProductsToolbar extends StatelessWidget {
           Expanded(
             child: Consumer(
               builder: (context, ref, child) {
-                final filteredProductsAsync =
-                    ref.watch(filteredProductsProvider);
+                final filteredProductsAsync = ref.watch(
+                  filteredProductsProvider,
+                );
                 return filteredProductsAsync.when(
                   data: (products) => Text(
                     'Todos los productos (${products.length} productos)',
@@ -153,11 +161,7 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.inventory_2_outlined,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.inventory_2_outlined, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'No se encontraron productos',
@@ -170,10 +174,7 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Intenta ajustar tus filtros de búsqueda',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
           ),
         ],
       ),
@@ -191,11 +192,7 @@ class _ErrorState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 80,
-            color: Colors.red[400],
-          ),
+          Icon(Icons.error_outline, size: 80, color: Colors.red[400]),
           const SizedBox(height: 16),
           Text(
             'No se pudieron cargar los productos',
@@ -207,11 +204,16 @@ class _ErrorState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
+<<<<<<< HEAD
             'Intenta de nuevo más tarde.',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
             ),
+=======
+            error,
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
             textAlign: TextAlign.center,
           ),
         ],

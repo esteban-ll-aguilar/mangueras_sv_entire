@@ -6,6 +6,7 @@ import 'package:mangueras_sv_entire/app/modules/inventory/infrastructure/provide
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/pages/edit_pages/edit_product_page.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/product_card.dart';
 import 'package:mangueras_sv_entire/app/modules/inventory/presentation/widgets/inventory_reusable_widgets.dart';
+import 'package:mangueras_sv_entire/core/utils/error_messages.dart';
 
 class ProductsPage extends ConsumerStatefulWidget {
   const ProductsPage({super.key});
@@ -19,7 +20,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
   String _query = '';
   String _selectedCategoryId = '';
   String _selectedBrandId = '';
-  
+
   // Variables para filtros avanzados
   String _sortBy = 'name'; // 'name', 'price', 'stock', 'code'
   bool _sortAscending = true;
@@ -107,7 +108,9 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
           comparison = ((a.price) as num).compareTo((b.price) as num);
           break;
         case 'stock':
-          comparison = ((a.stockQuantity) as int).compareTo((b.stockQuantity) as int);
+          comparison = ((a.stockQuantity) as int).compareTo(
+            (b.stockQuantity) as int,
+          );
           break;
         case 'code':
           comparison = (a.code).toString().compareTo((b.code).toString());
@@ -135,10 +138,20 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final crossAxisCount = width > 1200 ? 4 : width > 800 ? 3 : width > 500 ? 2 : 1;
-    
+    final crossAxisCount = width > 1200
+        ? 4
+        : width > 800
+        ? 3
+        : width > 500
+        ? 2
+        : 1;
+
     // Altura adaptativa según el ancho de pantalla
-    final cardHeight = width > 800 ? 300.0 : width > 500 ? 280.0 : 250.0;
+    final cardHeight = width > 800
+        ? 300.0
+        : width > 500
+        ? 280.0
+        : 250.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -152,22 +165,27 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
         centerTitle: true,
         elevation: 0,
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(width < 600 ? 200 : 160), // Altura adaptativa
+          preferredSize: Size.fromHeight(
+            width < 600 ? 200 : 160,
+          ), // Altura adaptativa
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12.0,
+              vertical: 8.0,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Campo de búsqueda
                 _buildSearchField(),
                 const SizedBox(height: 8),
-                
+
                 // Filtros por categoría y marca (adaptativo)
-                width < 600 
-                    ? _buildVerticalFilters() 
+                width < 600
+                    ? _buildVerticalFilters()
                     : _buildHorizontalFilters(),
                 const SizedBox(height: 8),
-                
+
                 // Botones de filtros y ordenamiento
                 _buildFilterButtons(width),
               ],
@@ -185,7 +203,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
             }
 
             if (snapshot.hasError) {
-              return _buildErrorState(snapshot.error.toString());
+              return _buildErrorState(safeErrorMessage(snapshot.error!));
             }
 
             final products = snapshot.data ?? [];
@@ -207,7 +225,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
               itemBuilder: (context, index) {
                 final productData = filteredProducts[index];
                 final product = productData;
-                
+
                 return ProductCard(
                   product: product,
                   brandName: product.brandName ?? 'Sin marca',
@@ -272,7 +290,10 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
               child: OutlinedButton.icon(
                 onPressed: _clearAllFilters,
                 icon: const Icon(Icons.clear, size: 16),
-                label: const Text('Limpiar filtros', style: TextStyle(fontSize: 12)),
+                label: const Text(
+                  'Limpiar filtros',
+                  style: TextStyle(fontSize: 12),
+                ),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                 ),
@@ -313,7 +334,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
       onPressed: _showSortDialog,
       icon: const Icon(Icons.sort, size: 16),
       label: Text(
-        _getSortText(), 
+        _getSortText(),
         style: const TextStyle(fontSize: 12),
         overflow: TextOverflow.ellipsis,
       ),
@@ -338,7 +359,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
       ),
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        side: _activeFiltersCount > 0 
+        side: _activeFiltersCount > 0
             ? BorderSide(color: Theme.of(context).primaryColor)
             : null,
       ),
@@ -374,7 +395,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
       onPressed: _showAdvancedFiltersDialog,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-        side: _activeFiltersCount > 0 
+        side: _activeFiltersCount > 0
             ? BorderSide(color: Theme.of(context).primaryColor)
             : null,
       ),
@@ -384,7 +405,9 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
           Icon(
             Icons.filter_alt,
             size: 14,
-            color: _activeFiltersCount > 0 ? Theme.of(context).primaryColor : null,
+            color: _activeFiltersCount > 0
+                ? Theme.of(context).primaryColor
+                : null,
           ),
           const SizedBox(width: 4),
           Expanded(
@@ -403,10 +426,18 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
   String _getSortTextShort() {
     String text = '';
     switch (_sortBy) {
-      case 'name': text = 'Nom'; break;
-      case 'price': text = 'Pre'; break;
-      case 'stock': text = 'Stk'; break;
-      case 'code': text = 'Cod'; break;
+      case 'name':
+        text = 'Nom';
+        break;
+      case 'price':
+        text = 'Pre';
+        break;
+      case 'stock':
+        text = 'Stk';
+        break;
+      case 'code':
+        text = 'Cod';
+        break;
     }
     return '$text ${_sortAscending ? '↑' : '↓'}';
   }
@@ -419,9 +450,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
         onPressed: _clearAllFilters,
         style: OutlinedButton.styleFrom(
           padding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: const Icon(Icons.clear, size: 16),
       ),
@@ -451,9 +480,9 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
         ref: ref,
         context: context,
         onError: (error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error)));
         },
       ),
       builder: (context, snapshot) {
@@ -467,7 +496,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
 
         final categories = [
           {'id': '', 'name': 'Todas las categorías'},
-          ...snapshot.data!
+          ...snapshot.data!,
         ];
 
         return DropdownButtonFormField<String>(
@@ -476,7 +505,10 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
             labelText: 'Categoría',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             prefixIcon: const Icon(Icons.category, size: 20),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             isDense: true,
           ),
           isExpanded: true,
@@ -504,16 +536,19 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
 
   Widget _buildBrandFilter() {
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: _selectedCategoryId.isEmpty 
-          ? Future.value(<Map<String, dynamic>>[]) // Si no hay categoría seleccionada, no mostrar marcas
-          : InventoryReusableWidgets.getBrandsByCategoryDropdown( // Necesitarás crear este método
+      future: _selectedCategoryId.isEmpty
+          ? Future.value(
+              <Map<String, dynamic>>[],
+            ) // Si no hay categoría seleccionada, no mostrar marcas
+          : InventoryReusableWidgets.getBrandsByCategoryDropdown(
+              // Necesitarás crear este método
               ref: ref,
               context: context,
               categoryId: _selectedCategoryId,
               onError: (error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(error)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(error)));
               },
             ),
       builder: (context, snapshot) {
@@ -531,7 +566,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
 
         final brands = [
           {'id': '', 'name': 'Todas las marcas'},
-          ...snapshot.data!
+          ...snapshot.data!,
         ];
 
         return DropdownButtonFormField<String>(
@@ -540,7 +575,10 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
             labelText: 'Marca',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             prefixIcon: const Icon(Icons.branding_watermark, size: 20),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             isDense: true,
           ),
           isExpanded: true,
@@ -590,7 +628,9 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
                 onChanged: (value) => setDialogState(() => _sortBy = value!),
               ),
               RadioListTile<String>(
-                title: const Text('Código'), // Cambiar "Fecha de creación" por "Código"
+                title: const Text(
+                  'Código',
+                ), // Cambiar "Fecha de creación" por "Código"
                 value: 'code',
                 groupValue: _sortBy,
                 onChanged: (value) => setDialogState(() => _sortBy = value!),
@@ -599,7 +639,8 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
               SwitchListTile(
                 title: const Text('Orden descendente'),
                 value: !_sortAscending,
-                onChanged: (value) => setDialogState(() => _sortAscending = !value),
+                onChanged: (value) =>
+                    setDialogState(() => _sortAscending = !value),
               ),
             ],
           ),
@@ -634,12 +675,14 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
                 SwitchListTile(
                   title: const Text('Solo productos en stock'),
                   value: _showOnlyInStock,
-                  onChanged: (value) => setDialogState(() => _showOnlyInStock = value),
+                  onChanged: (value) =>
+                      setDialogState(() => _showOnlyInStock = value),
                 ),
                 SwitchListTile(
                   title: const Text('Solo productos activos'),
                   value: _showOnlyActive,
-                  onChanged: (value) => setDialogState(() => _showOnlyActive = value),
+                  onChanged: (value) =>
+                      setDialogState(() => _showOnlyActive = value),
                 ),
                 const Divider(),
                 const Text('Rango de precios'),
@@ -669,7 +712,9 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
                         keyboardType: TextInputType.number,
                         onChanged: (value) {
                           final price = double.tryParse(value);
-                          setDialogState(() => _maxPrice = price ?? double.infinity);
+                          setDialogState(
+                            () => _maxPrice = price ?? double.infinity,
+                          );
                         },
                       ),
                     ),
@@ -710,10 +755,18 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
   String _getSortText() {
     String text = '';
     switch (_sortBy) {
-      case 'name': text = 'Nombre'; break;
-      case 'price': text = 'Precio'; break;
-      case 'stock': text = 'Stock'; break;
-      case 'code': text = 'Código'; break; // Cambiar 'date' por 'code'
+      case 'name':
+        text = 'Nombre';
+        break;
+      case 'price':
+        text = 'Precio';
+        break;
+      case 'stock':
+        text = 'Stock';
+        break;
+      case 'code':
+        text = 'Código';
+        break; // Cambiar 'date' por 'code'
     }
     return '$text ${_sortAscending ? '↑' : '↓'}';
   }
@@ -737,7 +790,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
       context: context,
       builder: (context) => EditProductPage(product: product),
     );
-    
+
     if (result == true) {
       _refresh();
     }
@@ -746,21 +799,16 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
   Future<void> _toggleProductStatus(ProductModel product) async {
     try {
       final repo = ref.read(inventoryProductRepositoryProvider);
-      await repo.updateProduct(
-        product.code,
-        {'is_active': !product.isActive},
-      );
-      
+      await repo.updateProduct(product.code, {'is_active': !product.isActive});
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            product.isActive 
-                ? 'Producto desactivado' 
-                : 'Producto activado'
+            product.isActive ? 'Producto desactivado' : 'Producto activado',
           ),
         ),
       );
-      
+
       _refresh();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -815,11 +863,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.inventory_2_outlined,
-            size: 64,
-            color: Colors.grey,
-          ),
+          const Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey),
           const SizedBox(height: 16),
           const Text('No se encontraron productos'),
           if (_activeFiltersCount > 0) ...[
@@ -852,7 +896,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                label, 
+                label,
                 style: const TextStyle(color: Colors.grey),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -879,7 +923,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            message, 
+            message,
             style: const TextStyle(color: Colors.grey),
             overflow: TextOverflow.ellipsis,
           ),
@@ -900,11 +944,15 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Row(
           children: [
-            Icon(Icons.branding_watermark, size: 20, color: Colors.grey.shade400),
+            Icon(
+              Icons.branding_watermark,
+              size: 20,
+              color: Colors.grey.shade400,
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                message, 
+                message,
                 style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
                 overflow: TextOverflow.ellipsis,
               ),

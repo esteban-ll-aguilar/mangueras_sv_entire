@@ -31,7 +31,20 @@ class _CreateUserFormState extends ConsumerState<CreateUserForm> {
     if (email.isEmpty || password.isEmpty || fullName.isEmpty) {
       // Mostrar mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, ingresa tanto el correo electrónico como la contraseña y el nombre completo')),
+        const SnackBar(
+          content: Text(
+            'Por favor, ingresa tanto el correo electrónico como la contraseña y el nombre completo',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('La contraseña debe tener al menos 8 caracteres'),
+        ),
       );
       return;
     }
@@ -42,11 +55,13 @@ class _CreateUserFormState extends ConsumerState<CreateUserForm> {
 
     try {
       // Lógica para registrar al usuario
-      await ref.read(authProvider.notifier).createUserProfile(
-        email: email,
-        password: password,
-        fullName: fullName,
-      );
+      await ref
+          .read(authProvider.notifier)
+          .createUserProfile(
+            email: email,
+            password: password,
+            fullName: fullName,
+          );
     } finally {
       setState(() {
         _isLoading = false; // Desactivar el estado de carga
@@ -149,7 +164,6 @@ class _CreateUserFormState extends ConsumerState<CreateUserForm> {
                               });
                             },
                           ),
-                          
 
                           const SizedBox(height: 32),
 
@@ -167,7 +181,6 @@ class _CreateUserFormState extends ConsumerState<CreateUserForm> {
                                   )
                                 : null,
                           ),
-                         
                         ],
                       ),
                     ),

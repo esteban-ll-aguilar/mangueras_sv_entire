@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Evidencia activa OWASP — Mangueras SV</title>
+<style>body{font-family:Arial,sans-serif;background:#f4f5f7;color:#18202a;margin:32px}h1{margin-bottom:4px}.meta{color:#56606b;margin-bottom:24px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:white;border:1px solid #d8dde3;border-left:7px solid #16794a;border-radius:8px;padding:18px;min-height:180px;box-shadow:0 2px 5px #0001}.partial{border-left-color:#c27b00}.risk{border-left-color:#b52c2c}.tag{font-weight:bold;color:#16794a}.partial .tag{color:#a26500}.risk .tag{color:#a21e1e}pre{background:#17202a;color:#d8f3dc;padding:10px;border-radius:5px;white-space:pre-wrap;font-size:12px}small{color:#667}</style></head>
+<body><h1>Evidencia activa OWASP Top 10</h1><div class="meta">Mangueras SV · http://127.0.0.1:45535/ · Brave · 23-10-2026 · pruebas autorizadas en entorno local</div><div class="grid">
+<section class="card risk"><h2>A01 · Broken Access Control</h2><div class="tag">EVIDENCIADO</div><p>Con JWT del cliente se modificó temporalmente <code>role</code> a <code>admin</code>; la API respondió HTTP 200. Se restauró a <code>cliente</code>.</p><pre>PATCH profiles.role=admin → HTTP 200
+restauración: role=cliente
+captura: A01-client-admin-route.png</pre><small>Evidencia activa de autorización insuficiente.</small></section>
+
+<section class="card"><h2>A02 · Security Misconfiguration</h2><div class="tag">EVIDENCIADO</div><p>El cliente incluye <code>.env</code> como asset. La migración expone lectura pública del bucket <code>inventory-images</code> y permite upload/delete autenticado. No apareció <code>service_role</code> en el cliente.</p><pre>pubspec.yaml:96  assets: - .env
+supabase/migrations/...:193-199
+SUPABASE_URL: https://xrnnmcolputazgqfewpz.supabase.co</pre><small>Prueba: revisión de build/configuración y políticas del bucket.</small></section>
+<section class="card partial"><h2>A03 · Supply Chain Failures</h2><div class="tag">EVIDENCIADO</div><p>La auditoría de dependencias evidenció deuda de versiones y paquetes discontinuados. OSV-Scanner queda pendiente para completar la cobertura CVE.</p><pre>flutter pub outdated --transitive
+94 locked older · 19 constraints older
+discontinued: build_resolvers, build_runner_core
+OSV-Scanner: no instalado</pre><small>Prueba: auditoría local de pubspec.lock y CI/CD.</small></section>
+<section class="card partial"><h2>A04 · Cryptographic Failures</h2><div class="tag">EVIDENCIADO</div><p>Se evidenció HTTPS, pero no se encontró implementación explícita de certificate pinning ni secure storage para sesión. Drift guarda SQLite local en nativo.</p><pre>URL: https://xrnnmcolputazgqfewpz.supabase.co
+native: todo-app.sqlite
+web: SQLite/WASM en memoria</pre><small>Conclusión: transporte protegido; protección local/pinning pendiente.</small></section>
+<section class="card risk"><h2>A05 · Injection</h2><div class="tag">EVIDENCIADO</div><p>PostgREST parametriza la consulta, por lo que no se confirmó SQL injection clásica. Sí se confirmó que los comodines no se escapan.</p><pre>product_repository_impl.dart:79
+.like('name', '%$name%')
+name=like.*%25*  → HTTP 200, 1 fila
+name=like.*_*    → HTTP 200, 1 fila</pre><small>Prueba activa con % y _ en la búsqueda.</small></section>
+<section class="card partial"><h2>A06 · Insecure Design</h2><div class="tag">EVIDENCIADO</div><p>Se creó pedido de prueba en estado <code>pendiente</code>. El cliente intentó cambiarlo a <code>vendido</code>; la API respondió 200 sin modificarlo. La venta no está vinculada a pago confirmado.</p><pre>cliente PATCH orders.status=vendido
+HTTP 200 · respuesta vacía
+verificación admin: status=pendiente</pre><small>Prueba activa con JWT de cliente y verificación admin.</small></section>
+<section class="card partial"><h2>A07 · Authentication Failures</h2><div class="tag">EVIDENCIADO</div><p>Se probaron cinco logins consecutivos con contraseña incorrecta. Todos devolvieron 400; no apareció 429 ni bloqueo observable.</p><pre>intentos: 1 2 3 4 5
+resultado: HTTP 400 Invalid login credentials
+429 / bloqueo: no observado</pre><small>La captura A10 muestra el mensaje genérico de error.</small></section>
+<section class="card risk"><h2>A08 · Data Integrity Failures</h2><div class="tag">EVIDENCIADO</div><p>Se subió un archivo con extensión <code>.exe</code> y payload <code>MZ-test-payload</code> declarando MIME <code>image/jpeg</code>. El bucket lo aceptó y lo sirvió públicamente con HTTP 200. Luego se eliminó.</p><pre>path: security-evidence/evidence-test.exe
+upload: HTTP 200
+public GET: HTTP 200 · 15 bytes
+inventory_storage_repository_impl.dart:62-75</pre><small>Prueba activa de validación MIME/extensión.</small></section>
+<section class="card partial"><h2>A09 · Logging &amp; Alerting Failures</h2><div class="tag">EVIDENCIADO</div><p>Se evidenció logging de errores en repositorios, desactivado en release, sin evidencia de alertas ni auditoría server-side en el repositorio. El dashboard Supabase queda como verificación complementaria.</p><pre>logging.e(...) → repositorios
+release: logging desactivado
+alertas/auditoría Supabase: no evidenciadas</pre><small>Revisión pendiente: Auth Logs y API Logs del dashboard Supabase.</small></section>
+<section class="card risk"><h2>A10 · Exceptional Conditions</h2><div class="tag">EVIDENCIADO</div><p>Hay rutas con <code>error.toString()</code> y catches silenciosos. El login inválido mostró mensaje genérico sin stack trace.</p><pre>Correo electrónico o contraseña inválidos.
+referencias: view_products_page.dart / repositorios
+captura: A10-brave-login-error.png</pre><small>Evidencia activa del manejo de errores.</small></section>
+</div><p><small>Esta página resume pruebas realizadas y referencias reproducibles; no sustituye la corrección de las vulnerabilidades.</small></p></body></html>

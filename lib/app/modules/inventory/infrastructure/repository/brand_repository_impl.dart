@@ -3,6 +3,7 @@ import 'package:mangueras_sv_entire/app/modules/inventory/domain/repository/bran
 import 'package:mangueras_sv_entire/core/core.dart';
 import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mangueras_sv_entire/core/utils/search_utils.dart';
 
 class BrandRepositoryImpl extends BrandRepository {
   final SupabaseClient _supabase;
@@ -31,7 +32,7 @@ class BrandRepositoryImpl extends BrandRepository {
           .from(supabaseTablesNames.brandTable.value)
           .select()
           .order('name', ascending: true);
-      
+
       final brands = (response as List)
           .map((e) => BrandModel.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -60,10 +61,11 @@ class BrandRepositoryImpl extends BrandRepository {
   @override
   Future<List<BrandModel>> getBrandsByName(String name) async {
     try {
+      final escapedName = escapeLikePattern(name.trim());
       final response = await _supabase
           .from(supabaseTablesNames.brandTable.value)
           .select()
-          .like('name', '%$name%')
+          .like('name', '%$escapedName%')
           .order('name', ascending: true);
       return (response as List)
           .map((e) => BrandModel.fromJson(e as Map<String, dynamic>))
@@ -89,7 +91,10 @@ class BrandRepositoryImpl extends BrandRepository {
   }
 
   @override
-  Future<BrandModel?> updateBrand(String brandId, Map<String, dynamic>  brandData) async {
+  Future<BrandModel?> updateBrand(
+    String brandId,
+    Map<String, dynamic> brandData,
+  ) async {
     try {
       final response = await _supabase
           .from(supabaseTablesNames.brandTable.value)
@@ -103,5 +108,4 @@ class BrandRepositoryImpl extends BrandRepository {
       return null;
     }
   }
-
 }

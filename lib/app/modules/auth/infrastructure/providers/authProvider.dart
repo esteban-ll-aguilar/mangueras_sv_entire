@@ -10,6 +10,7 @@ sealed class AuthState {
 
 class AuthStateAuthenticated extends AuthState {
   final User user;
+
   /// Rol cacheado desde public.profiles para guards síncronos del router.
   /// null = aún cargando / sin perfil.
   final String? role;
@@ -98,8 +99,6 @@ class Auth extends _$Auth {
     });
   }
 
-
-
   Future<void> signIn(String email, String password) async {
     try {
       final response = await _supabase.auth.signInWithPassword(
@@ -139,7 +138,14 @@ class Auth extends _$Auth {
         (lower.contains('short') || lower.contains('weak'))) {
       return 'La contraseña debe tener al menos 6 caracteres.';
     }
+<<<<<<< HEAD
     return 'Ocurrió un error de autenticación. Intenta de nuevo.';
+=======
+    if (lower.contains('email not confirmed')) {
+      return 'Debes confirmar tu correo antes de iniciar sesión.';
+    }
+    return 'No se pudo completar la operación. Intenta de nuevo.';
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
   }
 
   /// Registro público: siempre rol cliente por defecto.
@@ -149,13 +155,13 @@ class Auth extends _$Auth {
     String email,
     String password, {
     String fullName = '',
-    String role = 'cliente',
   }) async {
     try {
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,
-        data: {'full_name': fullName, 'role': role},
+        // Never accept a role from public registration input.
+        data: {'full_name': fullName},
       );
 
       // Si Supabase exige confirmación de email, session será null
@@ -167,10 +173,9 @@ class Auth extends _$Auth {
             'id': response.user!.id,
             'email': email,
             'full_name': fullName,
-            'role': role,
           }, onConflict: 'id');
         } catch (_) {}
-        state = AuthStateAuthenticated(response.user!, role: role);
+        state = AuthStateAuthenticated(response.user!, role: 'cliente');
       } else if (response.user != null && response.session == null) {
         state = const AuthStateError(
           'Cuenta creada. Revisa tu correo para confirmar tu cuenta.',
@@ -192,11 +197,17 @@ class Auth extends _$Auth {
       await _supabase.auth.signOut();
       state = const AuthStateUnauthenticated();
     } on AuthApiException catch (e) {
+<<<<<<< HEAD
       state = AuthStateError(_friendlyAuthError(e.message));
     } catch (e) {
       state = const AuthStateError(
         'No se pudo cerrar la sesión. Intenta de nuevo.',
       );
+=======
+      state = const AuthStateError('No se pudo cerrar la sesión.');
+    } catch (e) {
+      state = const AuthStateError('No se pudo cerrar la sesión.');
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     }
   }
 
@@ -204,10 +215,19 @@ class Auth extends _$Auth {
     try {
       await _supabase.auth.resetPasswordForEmail(email);
     } on AuthApiException catch (e) {
+<<<<<<< HEAD
       state = AuthStateError(_friendlyAuthError(e.message));
     } catch (_) {
       state = const AuthStateError(
         'No se pudo enviar el correo. Intenta de nuevo.',
+=======
+      state = const AuthStateError(
+        'No se pudo enviar el correo de recuperación.',
+      );
+    } catch (e) {
+      state = const AuthStateError(
+        'No se pudo enviar el correo de recuperación.',
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
       );
     }
   }
@@ -215,43 +235,53 @@ class Auth extends _$Auth {
   Future<void> updateUserProfile(Map<String, dynamic> updates) async {
     try {
       final response = await _supabase.auth.updateUser(
-        UserAttributes(
-          data: {...updates},
-        ),
+        UserAttributes(data: {...updates}),
       );
       if (response.user != null) {
         final role = await _fetchRole(response.user!.id);
         state = AuthStateAuthenticated(response.user!, role: role);
       }
     } on AuthApiException catch (e) {
+<<<<<<< HEAD
       state = AuthStateError(_friendlyAuthError(e.message));
     } catch (_) {
       state = const AuthStateError(
         'No se pudo actualizar el perfil. Intenta de nuevo.',
       );
+=======
+      state = const AuthStateError('No se pudo actualizar el perfil.');
+    } catch (e) {
+      state = const AuthStateError('No se pudo actualizar el perfil.');
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     }
   }
 
-  Future<void> createUserProfile({ required String email, required String password, required String fullName}) async {
+  Future<void> createUserProfile({
+    required String email,
+    required String password,
+    required String fullName,
+  }) async {
     try {
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,
-        data: {
-          'full_name': fullName,
-          'role': 'cliente',
-        }
+        data: {'full_name': fullName},
       );
       if (response.user != null) {
         state = AuthStateAuthenticated(response.user!, role: 'cliente');
       }
     } on AuthApiException catch (e) {
+<<<<<<< HEAD
       state = AuthStateError(_friendlyAuthError(e.message));
     } catch (_) {
       state = const AuthStateError(
         'No se pudo crear el usuario. Intenta de nuevo.',
       );
+=======
+      state = const AuthStateError('No se pudo crear el usuario.');
+    } catch (e) {
+      state = const AuthStateError('No se pudo crear el usuario.');
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     }
   }
-
 }

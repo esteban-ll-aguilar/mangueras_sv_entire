@@ -399,7 +399,10 @@ class _CreateProductsFormPageState
         }
 
         if (snapshot.hasError) {
-          return _buildInfoContainer('Error: ${snapshot.error}', Colors.red);
+          return _buildInfoContainer(
+            'No se pudo cargar la información.',
+            Colors.red,
+          );
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -511,7 +514,7 @@ class _CreateProductsFormPageState
           return Text('No hay categorías disponibles');
         }
         if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return const Text('No se pudo cargar la información.');
         }
         final categories = snapshot.data!;
         return DropdownButtonFormField<String>(
@@ -520,10 +523,7 @@ class _CreateProductsFormPageState
             labelText: 'Categoría del Producto',
             border: OutlineInputBorder(),
             prefixIcon: Icon(Icons.category),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 16,
-            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           ),
           hint: const Text('Seleccione una categoría'),
           items: categories.map((cat) {

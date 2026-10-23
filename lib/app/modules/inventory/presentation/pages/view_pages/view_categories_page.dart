@@ -123,11 +123,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
                     color: Theme.of(context).colorScheme.error,
                   ),
                   const SizedBox(height: 12),
-                  Center(
-                    child: Text(
-                      'Error al cargar categorías: ${snapshot.error}',
-                    ),
-                  ),
+                  Center(child: Text('No se pudieron cargar las categorías.')),
                   const SizedBox(height: 12),
                   Center(
                     child: ElevatedButton.icon(

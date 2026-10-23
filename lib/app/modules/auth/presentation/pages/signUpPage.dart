@@ -48,14 +48,18 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
 
     if (!_isValidEmail(email)) {
-      _showMessage('Por favor, ingresa un correo electrónico válido',
-          isError: true);
+      _showMessage(
+        'Por favor, ingresa un correo electrónico válido',
+        isError: true,
+      );
       return;
     }
 
-    if (password.length < 6) {
-      _showMessage('La contraseña debe tener al menos 6 caracteres',
-          isError: true);
+    if (password.length < 8) {
+      _showMessage(
+        'La contraseña debe tener al menos 8 caracteres',
+        isError: true,
+      );
       return;
     }
 

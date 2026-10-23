@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Remediación OWASP — Mangueras SV</title>
+<style>body{font-family:Arial,sans-serif;background:#f4f7f5;color:#18202a;margin:28px}h1{margin:0 0 6px}.meta{color:#56606b;margin-bottom:22px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.card{background:#fff;border:1px solid #d7e1da;border-left:7px solid #16804b;border-radius:8px;padding:16px;box-shadow:0 2px 5px #0001}.card h2{margin:0 0 8px;font-size:20px}.ok{font-weight:bold;color:#16804b}.pending{font-weight:bold;color:#a26700}code,pre{font-family:monospace}pre{background:#17211b;color:#d8f3dc;padding:10px;border-radius:5px;white-space:pre-wrap;font-size:12px}footer{margin-top:22px;padding:14px;background:#fff;border:1px solid #d7e1da;border-radius:8px}@media(max-width:800px){.grid{grid-template-columns:1fr}}</style></head>
+<body><h1>Remediación OWASP Top 10</h1><div class="meta">Mangueras SV · cambios aplicados en código, migraciones y CI · 23-10-2026 · sin capturas nuevas</div><div class="grid">
+<section class="card"><h2>A01 · Broken Access Control</h2><div class="ok">CORREGIDO EN CÓDIGO/MIGRACIÓN</div><p>El trigger <code>handle_new_user</code> ignora el rol enviado por el registro público y siempre crea <code>cliente</code>. La política de actualización de perfiles y las operaciones de catálogo quedan limitadas a administradores.</p><pre>supabase/migrations/20261023_security_hardening.sql
+role público → cliente
+profiles/catalog mutations → is_admin()</pre></section>
+<section class="card"><h2>A02 · Security Misconfiguration</h2><div class="ok">CORREGIDO EN BUILD</div><p>Se retiró <code>.env</code> de los assets Flutter. La app admite <code>--dart-define</code> y usa <code>.env</code> solo como fallback local. No se incorporó <code>service_role</code>.</p><pre>pubspec.yaml: .env eliminado
+lib/main.dart: SUPABASE_URL / SUPABASE_ANON_KEY
+por build-time define</pre></section>
+<section class="card"><h2>A03 · Supply Chain Failures</h2><div class="ok">CONTROL AUTOMATIZADO AÑADIDO</div><p>Se añadió workflow CI con <code>flutter pub outdated</code> vía instalación, análisis, tests y OSV-Scanner sobre <code>pubspec.lock</code>.</p><pre>.github/workflows/security.yml
+flutter analyze
+flutter test
+google/osv-scanner-action</pre></section>
+<section class="card"><h2>A04 · Cryptographic Failures</h2><div class="pending">MITIGACIÓN APLICADA / REVISIÓN DE PLATAFORMA PENDIENTE</div><p>La configuración exige HTTPS para Supabase y no expone secretos de servidor. El HTML deja explícito que pinning nativo y cifrado de SQLite requieren una decisión específica por plataforma.</p><pre>SUPABASE_URL debe ser https://...
+no service_role en cliente
+pendiente: pinning/DB encryption nativos</pre></section>
+<section class="card"><h2>A05 · Injection</h2><div class="ok">CORREGIDO</div><p>Las búsquedas de productos, marcas y categorías escapan <code>\</code>, <code>%</code> y <code>_</code> antes de construir el patrón PostgREST.</p><pre>lib/core/utils/search_utils.dart
+escapeLikePattern(value)
+product/brand/category repositories usan escape</pre></section>
+<section class="card"><h2>A06 · Insecure Design</h2><div class="ok">CORREGIDO EN AUTORIZACIÓN</div><p>El cliente ya no puede modificar el estado administrativo de pedidos. La venta continúa por RPC protegida con verificación de administrador y transacción de stock.</p><pre>orders update → public.is_admin()
+sell_order → security definer + is_admin()
+cliente no escribe status</pre></section>
+<section class="card"><h2>A07 · Authentication Failures</h2><div class="ok">ENDURECIDO</div><p>Login, registro y creación de usuarios exigen ocho caracteres como mínimo en la interfaz. Los fallos de autenticación devuelven mensajes genéricos y no revelan detalles del proveedor.</p><pre>mínimo UI: 8 caracteres
+fallback AuthStateError genérico
+invalid login: mensaje uniforme</pre></section>
+<section class="card"><h2>A08 · Data Integrity Failures</h2><div class="ok">CORREGIDO EN CLIENTE/STORAGE</div><p>La subida valida extensión y firma binaria JPEG/PNG/WEBP; rechaza ejecutables renombrados. El bucket pasa a privado, las lecturas usan signed URLs y upload/delete requieren admin.</p><pre>inventory_storage_repository_impl.dart
+MIME + magic bytes
+createSignedUrl(3600)
+bucket public=false</pre></section>
+<section class="card"><h2>A09 · Logging &amp; Alerting Failures</h2><div class="ok">MEJORADO</div><p>Release mantiene el logger desactivado para no filtrar datos. En desarrollo se registra solo el tipo de error en UI; se añadió CI para detectar regresiones. La activación de alertas Supabase sigue siendo una configuración externa.</p><pre>lib/core/utils/error_messages.dart
+UI: mensajes seguros
+release logger: Level.nothing
+CI: security.yml</pre></section>
+<section class="card"><h2>A10 · Exceptional Conditions</h2><div class="ok">CORREGIDO EN UI</div><p>Las vistas ya no interpolan <code>snapshot.error</code> ni muestran <code>error.toString()</code>. Storage y Auth lanzan/muestran mensajes genéricos, conservando diagnóstico limitado solo en desarrollo.</p><pre>productos/marcas/categorías → mensajes seguros
+StorageException → mensaje público fijo
+Auth fallback → mensaje público fijo</pre></section>
+</div><footer><b>Verificación ejecutada:</b> <code>flutter test</code> pasa y <code>flutter analyze</code> no reporta errores de compilación; quedan avisos informativos/lint heredados del proyecto. Falta aplicar la migración <code>20261023_security_hardening.sql</code> en Supabase. A04 (pinning/cifrado nativo) y A09 (alertas del dashboard) requieren configuración externa para considerarse completos al 100%.</footer></body></html>

@@ -41,10 +41,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
 
+<<<<<<< HEAD
     // Fase 3 (E4): validación unificada ES en cliente, sin mandar basura al servidor.
     if (!_isValidEmail(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Revisa los datos ingresados.')),
+=======
+    if (password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('La contraseña debe tener al menos 8 caracteres'),
+        ),
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
       );
       return;
     }

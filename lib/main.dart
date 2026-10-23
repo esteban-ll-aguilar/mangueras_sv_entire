@@ -11,11 +11,31 @@ import 'package:upgrader/upgrader.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: ".env");
+  try {
+    // Local development may use .env, but production/web must use dart-define.
+    await dotenv.load(fileName: ".env");
+  } catch (_) {
+    // Missing .env is expected in a packaged build.
+  }
+
+  const buildUrl = String.fromEnvironment('SUPABASE_URL');
+  const buildAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+  final supabaseUrl = buildUrl.isNotEmpty
+      ? buildUrl
+      : dotenv.env['SUPABASE_URL'];
+  final supabaseAnonKey = buildAnonKey.isNotEmpty
+      ? buildAnonKey
+      : dotenv.env['SUPABASE_ANON_KEY'];
+
+  if (supabaseUrl == null || supabaseAnonKey == null) {
+    throw StateError(
+      'Faltan SUPABASE_URL y SUPABASE_ANON_KEY. Usa --dart-define en builds.',
+    );
+  }
 
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
 
     authOptions: const FlutterAuthClientOptions(
       autoRefreshToken: true,

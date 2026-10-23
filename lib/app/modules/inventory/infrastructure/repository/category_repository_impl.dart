@@ -3,6 +3,7 @@ import 'package:mangueras_sv_entire/app/modules/inventory/domain/repository/cate
 import 'package:mangueras_sv_entire/core/core.dart';
 import 'package:mangueras_sv_entire/core/dependencies/dependencies_inyection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mangueras_sv_entire/core/utils/search_utils.dart';
 
 class CategoryRepositoryImpl extends CategoryRepository {
   final SupabaseClient _supabase;
@@ -59,10 +60,11 @@ class CategoryRepositoryImpl extends CategoryRepository {
   @override
   Future<List<CategoryModel>> getCategoriesByName(String name) async {
     try {
+      final escapedName = escapeLikePattern(name.trim());
       final response = await _supabase
           .from(supabaseTablesNames.categoryTable.value)
           .select()
-          .like('name', '%$name%')
+          .like('name', '%$escapedName%')
           .order('name', ascending: true);
       return (response as List)
           .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
@@ -72,7 +74,6 @@ class CategoryRepositoryImpl extends CategoryRepository {
       return [];
     }
   }
-
 
   @override
   Future<List<CategoryModel>> getMainCategories() async {
@@ -106,7 +107,10 @@ class CategoryRepositoryImpl extends CategoryRepository {
   }
 
   @override
-  Future<CategoryModel?> updateCategory(String categoryId, Map<String, dynamic> categoryData) async {
+  Future<CategoryModel?> updateCategory(
+    String categoryId,
+    Map<String, dynamic> categoryData,
+  ) async {
     try {
       final response = await _supabase
           .from(supabaseTablesNames.categoryTable.value)
@@ -114,7 +118,7 @@ class CategoryRepositoryImpl extends CategoryRepository {
           .eq('id', categoryId)
           .select()
           .single();
-      
+
       return CategoryModel.fromJson(response);
     } catch (e) {
       logging.e('Error updating category: $e');

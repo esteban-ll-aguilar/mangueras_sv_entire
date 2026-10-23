@@ -25,7 +25,6 @@ class _BrandsPageState extends ConsumerState<BrandsPage> {
     _brandsFuture = _filterByCategory();
   }
 
-
   Future<List<BrandModel>> _filterByCategory() async {
     final repo = ref.read(inventoryBrandCategoryRepositoryProvider);
     if (_selectedCategoryId.isEmpty) {
@@ -57,7 +56,11 @@ class _BrandsPageState extends ConsumerState<BrandsPage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final crossAxisCount = width > 900 ? 4 : width > 600 ? 3 : 2;
+    final crossAxisCount = width > 900
+        ? 4
+        : width > 600
+        ? 3
+        : 2;
     final cardHeight = 180.0;
 
     return Scaffold(
@@ -72,15 +75,20 @@ class _BrandsPageState extends ConsumerState<BrandsPage> {
         centerTitle: true,
         elevation: 0,
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(112), // Aumentar altura para ambos widgets
+          preferredSize: const Size.fromHeight(
+            112,
+          ), // Aumentar altura para ambos widgets
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12.0,
+              vertical: 8.0,
+            ),
             child: Column(
-              mainAxisSize: MainAxisSize.min, 
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // Campo de búsqueda
                 SizedBox(
-                  height: 48, 
+                  height: 48,
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: 'Buscar marcas...',
@@ -105,9 +113,9 @@ class _BrandsPageState extends ConsumerState<BrandsPage> {
                       ref: ref,
                       context: context,
                       onError: (msg) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(msg)),
-                        );
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(msg)));
                       },
                     ),
                     builder: (context, snapshot) {
@@ -126,7 +134,7 @@ class _BrandsPageState extends ConsumerState<BrandsPage> {
                           ),
                         );
                       }
-                      
+
                       if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return Container(
                           decoration: BoxDecoration(
@@ -141,7 +149,7 @@ class _BrandsPageState extends ConsumerState<BrandsPage> {
                           ),
                         );
                       }
-                      
+
                       if (snapshot.hasError) {
                         return Container(
                           decoration: BoxDecoration(
@@ -150,20 +158,25 @@ class _BrandsPageState extends ConsumerState<BrandsPage> {
                           ),
                           child: Center(
                             child: Text(
-                              'Error: ${snapshot.error}',
+                              'No se pudo cargar la información.',
                               style: const TextStyle(color: Colors.red),
                             ),
                           ),
                         );
                       }
-                      
+
                       final categories = [
-                        {'id': '', 'name': 'Todas las categorías'}, // Opción para mostrar todas
-                        ...snapshot.data!
+                        {
+                          'id': '',
+                          'name': 'Todas las categorías',
+                        }, // Opción para mostrar todas
+                        ...snapshot.data!,
                       ];
-                      
+
                       return DropdownButtonFormField<String>(
-                        value: _selectedCategoryId.isEmpty ? '' : _selectedCategoryId,
+                        value: _selectedCategoryId.isEmpty
+                            ? ''
+                            : _selectedCategoryId,
                         decoration: InputDecoration(
                           labelText: 'Filtrar por categoría',
                           border: OutlineInputBorder(
@@ -235,7 +248,7 @@ class _BrandsPageState extends ConsumerState<BrandsPage> {
                   ),
                   const SizedBox(height: 12),
                   Center(
-                    child: Text('Error al cargar marcas: ${snapshot.error}'),
+                    child: const Text('No se pudieron cargar las marcas.'),
                   ),
                   const SizedBox(height: 12),
                   Center(

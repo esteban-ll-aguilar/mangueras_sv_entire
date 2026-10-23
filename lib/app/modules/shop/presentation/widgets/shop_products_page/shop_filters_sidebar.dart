@@ -22,10 +22,7 @@ class ShopFiltersSidebar extends ConsumerWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Colors.grey[50]!,
-            Colors.white,
-          ],
+          colors: [Colors.grey[50]!, Colors.white],
         ),
         border: Border(right: BorderSide(color: Colors.grey[200]!, width: 1)),
       ),
@@ -64,7 +61,7 @@ class ShopFiltersSidebar extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Acciones rápidas en una grilla
                   GridView.count(
                     shrinkWrap: true,
@@ -78,13 +75,15 @@ class ShopFiltersSidebar extends ConsumerWidget {
                         icon: Icons.home_rounded,
                         label: 'Inicio',
                         color: const Color(0xFF1A237E),
-                        onTap: () => context.goNamed(AppRouteNames.shopWelcome.name),
+                        onTap: () =>
+                            context.goNamed(AppRouteNames.shopWelcome.name),
                       ),
                       _QuickActionButton(
                         icon: Icons.shopping_cart_rounded,
                         label: 'Carrito',
                         color: Colors.orange,
-                        onTap: () => context.goNamed(AppRouteNames.shopCart.name),
+                        onTap: () =>
+                            context.goNamed(AppRouteNames.shopCart.name),
                       ),
                       _QuickActionButton(
                         icon: Icons.phone_rounded,
@@ -112,15 +111,19 @@ class ShopFiltersSidebar extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 24),
                   const Divider(color: Colors.grey),
                   const SizedBox(height: 16),
-                  
+
                   // Título de filtros
                   Row(
                     children: [
-                      const Icon(Icons.tune_rounded, color: Colors.red, size: 24),
+                      const Icon(
+                        Icons.tune_rounded,
+                        color: Colors.red,
+                        size: 24,
+                      ),
                       const SizedBox(width: 12),
                       const Expanded(
                         child: Text(
@@ -134,7 +137,10 @@ class ShopFiltersSidebar extends ConsumerWidget {
                       ),
                       if (hasActiveFilters)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.red[50],
                             borderRadius: BorderRadius.circular(12),
@@ -152,7 +158,7 @@ class ShopFiltersSidebar extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  
+
                   // Botón limpiar filtros
                   if (hasActiveFilters)
                     SizedBox(
@@ -183,19 +189,20 @@ class ShopFiltersSidebar extends ConsumerWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 const SizedBox(height: 8), // Pequeño espacio desde el header
-                
+
                 _CategoryFilters(),
                 const SizedBox(height: 20),
                 _BrandFilters(),
                 const SizedBox(height: 40), // Espacio para el botón flotante
-                
                 // Footer informativo
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1A237E).withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF1A237E).withOpacity(0.1)),
+                    border: Border.all(
+                      color: const Color(0xFF1A237E).withOpacity(0.1),
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -265,7 +272,7 @@ class _BrandFilters extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _FilterSectionHeader(
-                title: 'Marcas', 
+                title: 'Marcas',
                 count: brands.length,
                 selectedCount: selectedBrandIds.length,
               ),
@@ -313,14 +320,21 @@ class _BrandFilters extends ConsumerWidget {
         );
       },
       loading: () => const _LoadingCard(title: 'Marcas'),
+<<<<<<< HEAD
       // Fase 3: genérico, sin error.toString().
       error: (_, __) => const _ErrorCard(title: 'Marcas'),
+=======
+      error: (error, stack) => const _ErrorCard(
+        title: 'Marcas',
+        error: 'No se pudieron cargar las marcas.',
+      ),
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     );
   }
 
   void _showAllBrandsDialog(BuildContext context, WidgetRef ref, List brands) {
     final selectedBrandIds = ref.read(shopFiltersProvider).selectedBrandIds;
-    
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -436,8 +450,15 @@ class _CategoryFilters extends ConsumerWidget {
         );
       },
       loading: () => const _LoadingCard(title: 'Categorías'),
+<<<<<<< HEAD
       // Fase 3: genérico, sin error.toString().
       error: (_, __) => const _ErrorCard(title: 'Categorías'),
+=======
+      error: (error, stack) => const _ErrorCard(
+        title: 'Categorías',
+        error: 'No se pudieron cargar las categorías.',
+      ),
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     );
   }
 }
@@ -449,7 +470,7 @@ class _FilterSectionHeader extends StatelessWidget {
   final int selectedCount;
 
   const _FilterSectionHeader({
-    required this.title, 
+    required this.title,
     required this.count,
     this.selectedCount = 0,
   });
@@ -468,7 +489,7 @@ class _FilterSectionHeader extends StatelessWidget {
           child: Text(
             title,
             style: const TextStyle(
-              fontWeight: FontWeight.bold, 
+              fontWeight: FontWeight.bold,
               fontSize: 16,
               color: Colors.black87,
             ),
@@ -501,7 +522,7 @@ class _FilterSectionHeader extends StatelessWidget {
           child: Text(
             '$count',
             style: TextStyle(
-              color: Colors.grey[600], 
+              color: Colors.grey[600],
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -534,16 +555,12 @@ class _QuickActionButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
-        child: Container (
+        child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                color: color,
-                size: 18,
-              ),
+              Icon(icon, color: color, size: 18),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
@@ -609,11 +626,7 @@ class _FilterItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: isSelected
-                    ? const Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 14,
-                      )
+                    ? const Icon(Icons.check, color: Colors.white, size: 14)
                     : null,
               ),
               const SizedBox(width: 12),
@@ -621,7 +634,9 @@ class _FilterItem extends StatelessWidget {
                 child: Text(
                   title,
                   style: TextStyle(
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                     color: isSelected ? Colors.red[700] : Colors.black87,
                     fontSize: 14,
                   ),
@@ -675,10 +690,7 @@ class _LoadingCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             'Cargando $title...',
-            style: TextStyle(
-              color: Colors.grey[500],
-              fontSize: 12,
-            ),
+            style: TextStyle(color: Colors.grey[500], fontSize: 12),
           ),
         ],
       ),
@@ -705,11 +717,7 @@ class _ErrorCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.error_outline,
-                color: Colors.red[600],
-                size: 20,
-              ),
+              Icon(Icons.error_outline, color: Colors.red[600], size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -725,11 +733,16 @@ class _ErrorCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
+<<<<<<< HEAD
             'Intenta de nuevo más tarde.',
             style: TextStyle(
               color: Colors.red[600],
               fontSize: 12,
             ),
+=======
+            error,
+            style: TextStyle(color: Colors.red[600], fontSize: 12),
+>>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
