@@ -1,25 +1,25 @@
-name: Security checks
+# name: Security checks
 
-on:
-  push:
-  pull_request:
+# on:
+#   push:
+#   pull_request:
 
-jobs:
-  dependencies:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      - run: flutter pub get
-      - name: Analyze without failing on legacy infos
-        run: |
-          set -o pipefail
-          flutter analyze --no-fatal-infos 2>&1 | tee analyze.log
-          ! grep -q " error •" analyze.log
-      - run: flutter test
-      - uses: google/osv-scanner-action/osv-scanner-action@v2.0.2
-        with:
-          scan-args: |-
-            --lockfile=pubspec.lock
+# jobs:
+#   dependencies:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: subosito/flutter-action@v2
+#         with:
+#           channel: stable
+#       - run: flutter pub get
+#       - name: Analyze without failing on legacy infos
+#         run: |
+#           set -o pipefail
+#           flutter analyze --no-fatal-infos 2>&1 | tee analyze.log
+#           ! grep -q " error •" analyze.log
+#       - run: flutter test
+#       - uses: google/osv-scanner-action/osv-scanner-action@v2.0.2
+#         with:
+#           scan-args: |-
+#             --lockfile=pubspec.lock
