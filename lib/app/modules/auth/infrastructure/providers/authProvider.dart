@@ -138,14 +138,7 @@ class Auth extends _$Auth {
         (lower.contains('short') || lower.contains('weak'))) {
       return 'La contraseña debe tener al menos 6 caracteres.';
     }
-<<<<<<< HEAD
     return 'Ocurrió un error de autenticación. Intenta de nuevo.';
-=======
-    if (lower.contains('email not confirmed')) {
-      return 'Debes confirmar tu correo antes de iniciar sesión.';
-    }
-    return 'No se pudo completar la operación. Intenta de nuevo.';
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
   }
 
   /// Registro público: siempre rol cliente por defecto.
@@ -197,17 +190,11 @@ class Auth extends _$Auth {
       await _supabase.auth.signOut();
       state = const AuthStateUnauthenticated();
     } on AuthApiException catch (e) {
-<<<<<<< HEAD
       state = AuthStateError(_friendlyAuthError(e.message));
     } catch (e) {
       state = const AuthStateError(
         'No se pudo cerrar la sesión. Intenta de nuevo.',
       );
-=======
-      state = const AuthStateError('No se pudo cerrar la sesión.');
-    } catch (e) {
-      state = const AuthStateError('No se pudo cerrar la sesión.');
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     }
   }
 
@@ -215,19 +202,10 @@ class Auth extends _$Auth {
     try {
       await _supabase.auth.resetPasswordForEmail(email);
     } on AuthApiException catch (e) {
-<<<<<<< HEAD
       state = AuthStateError(_friendlyAuthError(e.message));
     } catch (_) {
       state = const AuthStateError(
         'No se pudo enviar el correo. Intenta de nuevo.',
-=======
-      state = const AuthStateError(
-        'No se pudo enviar el correo de recuperación.',
-      );
-    } catch (e) {
-      state = const AuthStateError(
-        'No se pudo enviar el correo de recuperación.',
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
       );
     }
   }
@@ -242,17 +220,11 @@ class Auth extends _$Auth {
         state = AuthStateAuthenticated(response.user!, role: role);
       }
     } on AuthApiException catch (e) {
-<<<<<<< HEAD
       state = AuthStateError(_friendlyAuthError(e.message));
     } catch (_) {
       state = const AuthStateError(
         'No se pudo actualizar el perfil. Intenta de nuevo.',
       );
-=======
-      state = const AuthStateError('No se pudo actualizar el perfil.');
-    } catch (e) {
-      state = const AuthStateError('No se pudo actualizar el perfil.');
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     }
   }
 
@@ -271,17 +243,11 @@ class Auth extends _$Auth {
         state = AuthStateAuthenticated(response.user!, role: 'cliente');
       }
     } on AuthApiException catch (e) {
-<<<<<<< HEAD
       state = AuthStateError(_friendlyAuthError(e.message));
     } catch (_) {
       state = const AuthStateError(
         'No se pudo crear el usuario. Intenta de nuevo.',
       );
-=======
-      state = const AuthStateError('No se pudo crear el usuario.');
-    } catch (e) {
-      state = const AuthStateError('No se pudo crear el usuario.');
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     }
   }
 }

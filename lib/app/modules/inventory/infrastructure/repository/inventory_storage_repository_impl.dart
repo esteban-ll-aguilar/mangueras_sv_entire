@@ -20,7 +20,6 @@ class InventoryStorageRepositoryImpl implements InventoryStorageRepository {
     String fileName,
   ) async {
     try {
-<<<<<<< HEAD
       // Fase 3: validación real de tipo/peso antes de subir.
       final fileExtension = fileName.split('.').last.toLowerCase();
       if (!_allowedExtensions.contains(fileExtension)) {
@@ -28,14 +27,12 @@ class InventoryStorageRepositoryImpl implements InventoryStorageRepository {
       }
       if (imageBytes.lengthInBytes > _maxImageBytes) {
         throw StorageException('FILE_TOO_LARGE');
-=======
-      final fileExtension = fileName.split('.').last.toLowerCase();
+      }
       final mimeType = _detectImageMime(fileExtension, imageBytes);
       if (mimeType == null) {
         throw const StorageException(
           'Solo se permiten imágenes JPG, PNG o WEBP válidas.',
         );
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
       }
       final uniqueFileName = '${subFolder.name}/${id}.$fileExtension';
 
@@ -52,13 +49,9 @@ class InventoryStorageRepositoryImpl implements InventoryStorageRepository {
     } on StorageException {
       rethrow;
     } catch (e) {
-<<<<<<< HEAD
       // Fase 3: detalle solo en log, código genérico a UI.
       logging.e('uploadImage failed: $e');
       throw StorageException('UPLOAD_FAILED');
-=======
-      throw const StorageException('No se pudo subir la imagen.');
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     }
   }
 
@@ -71,19 +64,14 @@ class InventoryStorageRepositoryImpl implements InventoryStorageRepository {
 
       return url;
     } catch (e) {
-<<<<<<< HEAD
       logging.e('getImageUrl failed: $e');
       throw StorageException('LOAD_FAILED');
-=======
-      throw const StorageException('No se pudo obtener la imagen.');
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     }
   }
 
   @override
   Future<bool> deleteImage(String fileName) async {
     try {
-<<<<<<< HEAD
       await _supabase.storage
           .from(_bucketName)
           .remove([fileName]);
@@ -92,13 +80,6 @@ class InventoryStorageRepositoryImpl implements InventoryStorageRepository {
     } catch (e) {
       logging.e('deleteImage failed: $e');
       throw StorageException('DELETE_FAILED');
-=======
-      await _supabase.storage.from(_bucketName).remove([fileName]);
-
-      return true;
-    } catch (e) {
-      throw const StorageException('No se pudo eliminar la imagen.');
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     }
   }
 

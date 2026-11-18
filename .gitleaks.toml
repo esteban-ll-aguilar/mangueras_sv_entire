@@ -1,0 +1,9 @@
+title = "Mangueras SV Gitleaks configuration"
+
+# The IDOR evidence directory contains intentionally synthetic lab fixtures.
+# It is not application code and must not be used for real credentials.
+[allowlist]
+description = "Synthetic tokens used only in local security-lab evidence"
+paths = [
+  '''^evidencias_idor_simuladas/'''
+]

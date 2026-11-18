@@ -78,20 +78,12 @@ class ProductRepositoryImpl extends ProductRepository {
   @override
   Future<List<ProductModel>> getProductsByName(String name) async {
     try {
-<<<<<<< HEAD
       final safe = _escapeLike(name.trim());
       if (safe.isEmpty) return [];
       final response = await _supabase
           .from('products_view_flat')
           .select()
           .like('name', '%$safe%');
-=======
-      final escapedName = escapeLikePattern(name.trim());
-      final response = await _supabase
-          .from('products_view_flat')
-          .select()
-          .like('name', '%$escapedName%');
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
       return (response as List)
           .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -146,27 +138,12 @@ class ProductRepositoryImpl extends ProductRepository {
     Set<String>? categoryIds,
   }) async {
     try {
-<<<<<<< HEAD
       var query = _supabase
           .from('products_view_flat')
           .select();
-          if (productName != null && productName.trim().isNotEmpty) {
-            final safe = _escapeLike(productName.trim());
-            query = query.or('name.ilike.%$safe%,code.ilike.%$safe%');
-          }
-          if (brandIds != null && brandIds.isNotEmpty) {
-            query = query.inFilter('brand_id', brandIds.toList());
-          }
-          if (categoryIds != null && categoryIds.isNotEmpty) {
-            query = query.inFilter('category_id', categoryIds.toList());
-          }
-          if (isActive != null) {
-            query = query.eq('is_active', isActive);
-          }
-=======
-      var query = _supabase.from('products_view_flat').select();
-      if (productName != null && productName.isNotEmpty) {
-        query = query.or('name.ilike.%$productName%,code.ilike.%$productName%');
+      if (productName != null && productName.trim().isNotEmpty) {
+        final safe = _escapeLike(productName.trim());
+        query = query.or('name.ilike.%$safe%,code.ilike.%$safe%');
       }
       if (brandIds != null && brandIds.isNotEmpty) {
         query = query.inFilter('brand_id', brandIds.toList());
@@ -177,7 +154,6 @@ class ProductRepositoryImpl extends ProductRepository {
       if (isActive != null) {
         query = query.eq('is_active', isActive);
       }
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
 
       query.order('name', ascending: true);
       final response = await query;

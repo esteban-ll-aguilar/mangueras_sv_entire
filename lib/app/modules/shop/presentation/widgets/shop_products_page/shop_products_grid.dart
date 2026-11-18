@@ -87,14 +87,8 @@ class ShopProductsGrid extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-<<<<<<< HEAD
             // Fase 3: mensaje genérico, sin exponer error.toString() (tabla/vista/query).
             error: (_, __) => const _ErrorState(),
-=======
-            error: (error, stack) => const _ErrorState(
-              error: 'No se pudieron cargar los productos.',
-            ),
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
           ),
         ),
       ],
@@ -204,16 +198,11 @@ class _ErrorState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-<<<<<<< HEAD
             'Intenta de nuevo más tarde.',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
             ),
-=======
-            error,
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
             textAlign: TextAlign.center,
           ),
         ],

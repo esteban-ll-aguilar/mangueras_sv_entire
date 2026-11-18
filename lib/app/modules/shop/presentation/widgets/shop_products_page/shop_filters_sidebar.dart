@@ -320,15 +320,8 @@ class _BrandFilters extends ConsumerWidget {
         );
       },
       loading: () => const _LoadingCard(title: 'Marcas'),
-<<<<<<< HEAD
       // Fase 3: genérico, sin error.toString().
       error: (_, __) => const _ErrorCard(title: 'Marcas'),
-=======
-      error: (error, stack) => const _ErrorCard(
-        title: 'Marcas',
-        error: 'No se pudieron cargar las marcas.',
-      ),
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     );
   }
 
@@ -450,15 +443,8 @@ class _CategoryFilters extends ConsumerWidget {
         );
       },
       loading: () => const _LoadingCard(title: 'Categorías'),
-<<<<<<< HEAD
       // Fase 3: genérico, sin error.toString().
       error: (_, __) => const _ErrorCard(title: 'Categorías'),
-=======
-      error: (error, stack) => const _ErrorCard(
-        title: 'Categorías',
-        error: 'No se pudieron cargar las categorías.',
-      ),
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
     );
   }
 }
@@ -733,16 +719,11 @@ class _ErrorCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-<<<<<<< HEAD
             'Intenta de nuevo más tarde.',
             style: TextStyle(
               color: Colors.red[600],
               fontSize: 12,
             ),
-=======
-            error,
-            style: TextStyle(color: Colors.red[600], fontSize: 12),
->>>>>>> 66286d4 (feat: enhance error handling and UI feedback across inventory and shop modules)
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),

@@ -1,0 +1,17 @@
+.git
+.dart_tool
+.idea
+.env
+android
+ios
+linux
+macos
+windows
+test
+tools
+supabase
+evidencias_idor_simuladas
+Documents
+openspec
+*.log
+pubspec.lock
