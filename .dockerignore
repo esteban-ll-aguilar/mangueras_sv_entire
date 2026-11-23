@@ -12,6 +12,8 @@ tools
 supabase
 evidencias_idor_simuladas
 Documents
+APE-01
+APE-02
 openspec
 *.log
 pubspec.lock

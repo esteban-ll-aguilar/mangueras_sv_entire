@@ -16,6 +16,7 @@ Resultado final:
 - Se añadió `Dockerfile` y `.dockerignore`.
 - La imagen se construyó con Podman y se ejecutó como usuario sin privilegios.
 - La aplicación respondió `HTTP/1.1 200 OK` por el puerto 8080.
+- Trivy terminó sin vulnerabilidades HIGH/CRITICAL después de actualizar los paquetes Alpine.
 
 La aplicación quedó preparada para análisis continuo y despliegue como sitio Flutter Web estático.
 
@@ -165,6 +166,9 @@ La imagen aplica estas medidas:
 ```dockerfile
 FROM docker.io/nginxinc/nginx-unprivileged:alpine
 
+USER root
+RUN apk upgrade --no-cache
+
 COPY build/web/ /usr/share/nginx/html/
 
 EXPOSE 8080
@@ -213,6 +217,17 @@ ports={"8080/tcp":{}}
 
 La imagen se construyó, inició y sirvió correctamente la aplicación Flutter Web.
 
+#### 5.2.4 Escaneo de vulnerabilidades
+
+Se exportó la imagen y se ejecutó Trivy sobre el artefacto generado:
+
+```bash
+podman save --output /tmp/mangueras-sv-web-phase4-final.tar mangueras-sv-web:phase4
+trivy image --input /tmp/mangueras-sv-web-phase4-final.tar --severity HIGH,CRITICAL
+```
+
+La primera revisión identificó 14 vulnerabilidades con versión corregida disponible en paquetes Alpine. Se incorporó `apk upgrade --no-cache`, se reconstruyó la imagen y se repitió el escaneo: resultado final **0 vulnerabilidades HIGH/CRITICAL**.
+
 ### Actividad 3: Consolidación del portafolio — 20 minutos
 
 El portafolio de la Unidad 1 queda integrado por:
@@ -237,6 +252,7 @@ El portafolio de la Unidad 1 queda integrado por:
 | Puerto | `8080` | Exposición mínima |
 | Runtime | Nginx unprivileged Alpine | Pasa |
 | Smoke test | `curl http://127.0.0.1:18080/` | HTTP 200 |
+| Trivy | Imagen final, HIGH/CRITICAL | 0 vulnerabilidades |
 
 ## 7. Conclusiones
 
