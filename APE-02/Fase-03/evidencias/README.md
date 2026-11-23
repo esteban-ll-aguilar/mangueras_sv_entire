@@ -9,4 +9,4 @@ Las pruebas reproducibles y el ciclo completo de mitigación están en el [infor
 - Payload SQLi: rechazado por validación de UUID (`22P02`, HTTP 400).
 - Payload XSS: mostrado como texto por Flutter, sin ejecución.
 
-No se inventaron capturas de DVWA. Si el docente exige imágenes de la guía, deben agregarse aquí como capturas tomadas durante el laboratorio; el informe deja separado ese laboratorio de las pruebas reales contra Supabase.
+La evidencia textual completa quedó integrada directamente en el [README de Fase 3](../README.md), incluyendo payloads, respuestas observadas, mitigaciones y repruebas. El laboratorio DVWA y la aplicación real de Supabase se mantienen separados para no presentar resultados de un entorno como si fueran del otro.
